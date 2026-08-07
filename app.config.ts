@@ -32,15 +32,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   platforms: ['ios', 'android', 'web'],
 
   // ─── Expo Updates (OTA) ────────────────────────────────────────────────────
-  // EAS dashboard'dan projectId'yi alın:
-  // https://expo.dev/accounts/[account]/projects/yiu-mobile-app
-  //updates: {
-   // fallbackToCacheTimeout: 0,
-    // url: 'https://u.expo.dev/YOUR_PROJECT_ID', // EAS kurulduktan sonra ekleyin
-  //},
- // runtimeVersion: {
-  //  policy: 'appVersion',
-//  },
+  // https://expo.dev/accounts/synsy/projects/yiu-mobile-app
+  updates: {
+    fallbackToCacheTimeout: 0,
+    url: 'https://u.expo.dev/c780b3f6-4302-4a2c-b0b6-2c4bbee1551a',
+  },
+  runtimeVersion: {
+    policy: 'appVersion',
+  },
 
   // ─── Expo Plugins ─────────────────────────────────────────────────────────
   plugins: ['expo-secure-store'],
@@ -50,7 +49,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     env: APP_ENV,
     apiBaseUrl: API_BASE_URL,
     sentryDsn: process.env.SENTRY_DSN ?? '',
-    // EAS kurulumundan sonra otomatik eklenir:
-    // eas: { projectId: 'YOUR_PROJECT_ID' },
+    eas: { projectId: 'c780b3f6-4302-4a2c-b0b6-2c4bbee1551a' },
   },
+  owner: 'synsy',
 });
