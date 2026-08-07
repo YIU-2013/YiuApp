@@ -7,6 +7,21 @@ Bu doküman bir **plan**dır — bu commit ile birlikte backend veya admin panel
 Mobil uygulamanın mevcut mimarisi (React Query + servis/hook katmanı, tema sistemi, type-safe
 navigasyon) korunmaktadır.
 
+### Faz Ayrımı — Netleştirme
+
+- **Mobil app şu an tamamen mock servislerle çalışıyor** (`src/services/*.ts` içindeki `MOCK`
+  diziler) — hiçbir gerçek backend çağrısı yapmıyor. Bu, ürünün bilinçli bir aşaması, hata değil.
+- **Backend/API kurulumu ayrı bir fazdır** (Faz 2) — mobil app'in mevcut UI/UX çalışmasından
+  tamamen bağımsız başlar, mobil kod tabanını beklemez.
+- **Admin panel kurulumu ayrı bir fazdır** (Faz 3) — backend API'nin admin endpointleri (bölüm
+  6'daki `/api/admin/*`) hazır olmadan başlamaz, ama backend'le paralel/iteratif ilerleyebilir.
+- **Mobil app'in gerçek API'ye geçişi Faz 4'tür** — Faz 2 ve 3 tamamlanana kadar mobil app'te
+  hiçbir kod değişikliği yapılmaz; geçiş yalnızca bölüm 6'daki servis dosyalarında,
+  tek satırlık (`MOCK` → `apiClient.get(...)`) değişikliklerle olacak.
+
+Kısacası: **backend başlamak için mobil app'in "bitmiş" olmasını beklemiyor, ama mobil app'in
+gerçek veriye geçmesi backend + admin panel'in belirli bir olgunluğa ulaşmasını bekliyor.**
+
 ---
 
 ## 1. Neden Admin Panel Gerekiyor?
@@ -276,7 +291,26 @@ deseniyle (merkezi, tek noktadan yönetilen Axios instance) doğrudan uyumludur.
 
 ---
 
-## 9. Açık Riskler / Notlar
+## 9. Önerilen Repo Yapısı (İleride Monorepo'ya Geçiş)
+
+Şu anda repo (`YIU-2013/YiuApp`) yalnızca mobil uygulamayı içeriyor — bu **değişmiyor**, backend
+ve admin panel için ayrı repo mu yoksa monorepo mu kullanılacağına Faz 2 sonunda karar verilecek
+(bkz. bölüm 7, Phase 3 notu). Eğer monorepo'ya geçilirse önerilen üst düzey klasör yapısı:
+
+```text
+mobile-app/       — mevcut Expo React Native TypeScript projesi (bu repodaki içerik buraya taşınır)
+backend-api/      — ASP.NET Core Web API + PostgreSQL (Faz 2)
+admin-panel/      — React + TypeScript admin paneli (Faz 3)
+docs/             — bu roadmap ve diğer mimari dokümanlar (repo kökünde kalır)
+```
+
+Bu yapıya geçiş **Faz 2 başlamadan hemen önce** değerlendirilecek; mobil app'in `src/`, `assets/`,
+config dosyaları vb. `mobile-app/` altına taşınacak, kök dizindeki `docs/` klasörü ortak kalacak.
+Bu taşıma işlemi ayrı bir görev olarak ele alınacak, bu commit'te yapılmadı.
+
+---
+
+## 10. Açık Riskler / Notlar
 
 - Mobil tarafta şu an **hiçbir gerçek API çağrısı yok** — `apiClient.ts` tanımlı ama kullanılmıyor.
   Faz 4 öncesi bu durum değişmeyecek, bilinçli bir tercih.
