@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import HomeStack from './HomeStack';
 import DepartmentStack from './DepartmentStack';
@@ -34,7 +35,21 @@ const TAB_LABELS: Record<keyof RootTabParamList, string> = {
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
+// İkon + label için gerçek içerik yüksekliği (safe-area/inset hariç)
+const TAB_BAR_CONTENT_HEIGHT = rs(40);
+const TAB_BAR_PADDING_TOP = rs(6);
+
 export default function AppNavigator() {
+  // Android gesture/navigation bar ve iOS home-indicator yüksekliği cihazdan
+  // cihaza değişir — sabit paddingBottom yerine gerçek safe-area inset'i
+  // kullanılıyor ki tab bar sistem çubuğuyla çakışmasın veya gereksiz
+  // yüksek durmasın.
+  const insets = useSafeAreaInsets();
+  const tabBarPaddingBottom = Platform.OS === 'ios'
+    ? Math.max(insets.bottom, rs(8))
+    : Math.max(insets.bottom, rs(10));
+  const tabBarHeight = TAB_BAR_CONTENT_HEIGHT + TAB_BAR_PADDING_TOP + tabBarPaddingBottom;
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -46,7 +61,10 @@ export default function AppNavigator() {
         tabBarLabel: TAB_LABELS[route.name as keyof RootTabParamList],
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [
+          styles.tabBar,
+          { height: tabBarHeight, paddingBottom: tabBarPaddingBottom },
+        ],
         tabBarLabelStyle: styles.tabBarLabel,
         tabBarItemStyle: styles.tabBarItem,
         tabBarHideOnKeyboard: true,
@@ -80,9 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tabBarBg,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.borderSubtle,
-    height: Platform.OS === 'ios' ? rs(82) : rs(64),
-    paddingTop: rs(6),
-    paddingBottom: Platform.OS === 'ios' ? rs(22) : rs(8),
+    paddingTop: TAB_BAR_PADDING_TOP,
     ...shadows.tabBar,
   },
   tabBarLabel: {
