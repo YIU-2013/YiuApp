@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const TOKEN_STORAGE_KEY = 'yiu_admin_token';
 
@@ -6,12 +7,11 @@ const TOKEN_STORAGE_KEY = 'yiu_admin_token';
  * Merkezi Axios instance — backend-api hazır olduğunda /api/admin/* ve
  * /api/auth/* endpointlerine buradan bağlanılacak.
  *
- * Bu iskelet commit'inde backend henüz canlı değil; sayfalar bu client'ı
- * import edebilir ama gerçek bir istek atmak (backend hazır olana kadar)
- * hata dönecektir — bu beklenen bir durumdur.
+ * `USE_MOCK_API` true olduğu sürece (varsayılan) servisler bu client'ı hiç
+ * çağırmaz — bkz. src/api/mockClient.ts ve src/services/*.ts.
  */
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

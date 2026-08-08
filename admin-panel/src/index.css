@@ -1,11 +1,18 @@
 :root {
   --primary: #0b2e6b;
+  --primary-hover: #143f8c;
   --accent: #d62828;
   --bg: #f7f8fa;
   --surface: #ffffff;
   --border: #e5e7eb;
+  --border-subtle: #f3f4f6;
   --text: #111827;
   --text-muted: #6b7280;
+  --text-faint: #9ca3af;
+  --success: #16a34a;
+  --success-bg: #dcfce7;
+  --danger: #dc2626;
+  --danger-bg: #fee2e2;
 
   font: 15px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
@@ -25,12 +32,16 @@ h1 {
   font-size: 22px;
   font-weight: 700;
   color: var(--primary);
-  margin: 0 0 8px;
+  margin: 0;
 }
 
 p {
   margin: 0;
   color: var(--text-muted);
+}
+
+button {
+  font-family: inherit;
 }
 
 /* ─── App shell (sidebar + content) ─────────────────────────────────────── */
@@ -45,6 +56,8 @@ p {
   background: var(--primary);
   color: #fff;
   padding: 20px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-sidebar__brand {
@@ -54,6 +67,10 @@ p {
   padding: 0 20px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   margin-bottom: 12px;
+}
+
+.app-sidebar nav {
+  flex: 1;
 }
 
 .app-sidebar nav ul {
@@ -83,12 +100,56 @@ p {
   font-weight: 600;
 }
 
+.app-sidebar__footer {
+  padding: 16px 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: 12px;
+}
+
+.app-sidebar__user-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.app-sidebar__user-role {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.app-sidebar__logout {
+  margin-top: 12px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.app-sidebar__logout:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .app-content {
   flex: 1;
   padding: 32px;
+  min-width: 0;
 }
 
-/* ─── Page placeholder ───────────────────────────────────────────────────── */
+.auth-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+/* ─── Page placeholder (henüz kalan varsa) ─────────────────────────────────── */
 .page-placeholder {
   max-width: 560px;
   background: var(--surface);
@@ -128,9 +189,23 @@ p {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
+.login-card h1 {
+  margin-bottom: 8px;
+}
+
 .login-card__hint {
   font-size: 13px;
   margin-bottom: 16px;
+}
+
+.login-card__error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
 }
 
 .login-card label {
@@ -156,6 +231,413 @@ p {
   color: #fff;
   font-weight: 600;
   font-size: 14px;
+  cursor: pointer;
+}
+
+.login-card button:hover {
+  background: var(--primary-hover);
+}
+
+.login-card button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+/* ─── Page header ────────────────────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.page-header__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 4px;
+}
+
+.page-header__description {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn--primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn--secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn--secondary:hover {
+  background: var(--border-subtle);
+}
+
+.btn--danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.btn--danger:hover {
+  background: #fecaca;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-muted);
+}
+.btn--ghost:hover {
+  background: var(--border-subtle);
+}
+
+.btn--sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Toolbar ────────────────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* ─── Data table ─────────────────────────────────────────────────────────── */
+.data-table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: var(--border-subtle);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  background: var(--border-subtle);
+}
+
+.data-table__title {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.data-table__muted {
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.data-table__actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* ─── Status badge ───────────────────────────────────────────────────────── */
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.status-badge--active {
+  background: var(--success-bg);
+  color: #166534;
+}
+
+.status-badge--inactive {
+  background: var(--border-subtle);
+  color: var(--text-faint);
+}
+
+.badge-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #eef4ff;
+  color: var(--primary);
+}
+
+/* ─── Empty / loading / error states ────────────────────────────────────── */
+.state-block {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.state-block--error {
+  color: var(--danger);
+}
+
+.state-block small {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+/* ─── Modal / form modal / confirm dialog ───────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+}
+
+.modal--sm {
+  max-width: 380px;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal__header h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.modal__close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-faint);
+  padding: 4px;
+}
+
+.modal__body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ─── Forms ──────────────────────────────────────────────────────────────── */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.field-error {
+  font-size: 11px;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-direction: row;
+}
+
+.checkbox-field input {
+  width: 16px;
+  height: 16px;
+}
+
+.checkbox-field label {
+  margin: 0;
+}
+
+/* ─── Dashboard ──────────────────────────────────────────────────────────── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.stat-card__value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.stat-card__label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.dashboard-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.dashboard-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.dashboard-panel h2 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 12px;
+}
+
+.dashboard-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.dashboard-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }

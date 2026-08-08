@@ -1,23 +1,46 @@
 import { useState, type FormEvent } from 'react';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
-/**
- * Giriş ekranı iskeleti. Backend Auth modülü Faz-2'de implemente edildikten
- * sonra bu form gerçek /api/auth/login çağrısına bağlanacak (bkz. src/api/client.ts).
- */
 export default function LoginPage() {
+  const { login, isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  // Zaten giriş yapılmışsa login ekranını tekrar gösterme.
+  if (!isLoading && isAuthenticated) {
+    const from = (location.state as { from?: string } | null)?.from ?? '/';
+    return <Navigate to={from} replace />;
+  }
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // TODO (Faz 2): apiClient.post('/api/auth/login', { email, password })
+    setError(null);
+    setSubmitting(true);
+    try {
+      await login(email, password);
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Giriş yapılamadı.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="login-page">
       <form className="login-card" onSubmit={handleSubmit}>
         <h1>YIU Admin Panel</h1>
-        <p className="login-card__hint">Backend hazır olduğunda giriş aktif olacak.</p>
+        <p className="login-card__hint">
+          Geliştirme girişi: admin@yiu.edu.tr / ChangeMe123!
+        </p>
+
+        {error && <div className="login-card__error">{error}</div>}
 
         <label htmlFor="email">E-posta</label>
         <input
@@ -25,8 +48,9 @@ export default function LoginPage() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="ornek@yiu.edu.tr"
+          placeholder="admin@yiu.edu.tr"
           autoComplete="username"
+          required
         />
 
         <label htmlFor="password">Şifre</label>
@@ -37,10 +61,11 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
           autoComplete="current-password"
+          required
         />
 
-        <button type="submit" disabled>
-          Giriş Yap
+        <button type="submit" disabled={submitting}>
+          {submitting ? 'Giriş yapılıyor…' : 'Giriş Yap'}
         </button>
       </form>
     </div>

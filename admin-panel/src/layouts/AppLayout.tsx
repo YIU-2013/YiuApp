@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
 interface NavItem {
   to: string;
@@ -22,6 +23,14 @@ const NAV_ITEMS: NavItem[] = [
  * Yetkilendirme (route guard) Faz-2'de Auth modülüyle birlikte eklenecek.
  */
 export default function AppLayout() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <div className="app-shell">
       <aside className="app-sidebar">
@@ -37,6 +46,15 @@ export default function AppLayout() {
             ))}
           </ul>
         </nav>
+        <div className="app-sidebar__footer">
+          <div className="app-sidebar__user">
+            <div className="app-sidebar__user-name">{user?.name}</div>
+            <div className="app-sidebar__user-role">{user?.role}</div>
+          </div>
+          <button type="button" className="app-sidebar__logout" onClick={handleLogout}>
+            Çıkış Yap
+          </button>
+        </div>
       </aside>
       <main className="app-content">
         <Outlet />
