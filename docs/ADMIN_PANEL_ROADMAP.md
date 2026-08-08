@@ -3,9 +3,20 @@
 Bu doküman, şu anda mock veriyle çalışan **YIU Mobile App**'in ileride gerçek bir backend API'ye
 ve web tabanlı bir admin panelden yönetilebilir hale gelmesi için mimari planı tanımlar.
 
-Bu doküman bir **plan**dır — bu commit ile birlikte backend veya admin panel kodu yazılmamıştır.
 Mobil uygulamanın mevcut mimarisi (React Query + servis/hook katmanı, tema sistemi, type-safe
 navigasyon) korunmaktadır.
+
+### Güncel Durum
+
+- **Backend-api ve admin-panel başlatılıyor** — `backend-api/` (ASP.NET Core Web API iskeleti)
+  ve `admin-panel/` (React + Vite iskeleti) bu aşamada eklendi. Detaylı plan için
+  [`PLATFORM_IMPLEMENTATION_PLAN.md`](./PLATFORM_IMPLEMENTATION_PLAN.md)'ye bakın.
+- **Mobil app mock veriyle çalışmaya devam ediyor** — hiçbir mobil dosyaya dokunulmadı, gerçek
+  API bağlantısı yok.
+- **EAS build ve gerçek cihaz testi en son alınacak** — Faz 2/3/4 tamamlanıp mobil app gerçek
+  API'ye bağlandıktan sonra, yayına yakın son build/test turu yapılacak.
+- **Mobil app gerçek API'ye backend ve admin panel olgunlaştıktan sonra bağlanacak** (Faz 4,
+  aşağıdaki Faz Ayrımı bölümünde detaylandırılmıştır).
 
 ### Faz Ayrımı — Netleştirme
 
@@ -235,25 +246,26 @@ DELETE /api/admin/opportunities/:id
 
 ## 7. Faz Planı
 
-### Phase 1 — Mobile App Store Hazırlığı *(büyük ölçüde tamamlandı)*
+### Phase 1 — Mobile App Store Hazırlığı *(UI tamamlandı, EAS preview build alındı)*
 - Mevcut mobil app UI tamamlandı (öğrenci aidiyeti yönü, FeaturedSlider, Kampüsüm, yeniden
-  tasarlanmış Fırsatlar/İletişim).
-- EAS/config hazırlığı yapıldı (`eas.json` geçerli JSON'a düzeltildi, icon/adaptive-icon/favicon
-  üretildi, `.gitignore` eklendi).
-- **Kalan:** EAS preview build'in gerçek cihazda alınması (`eas login` + `eas build:configure`
-  hesap işlemleri gerektiriyor, geliştirici tarafından yapılmalı), gerçek cihaz testleri, store
-  listing assetleri (ekran görüntüleri, açıklama metni — repo dışı).
+  tasarlanmış Fırsatlar/İletişim, Android safe-area/tab-bar düzeltmesi).
+- EAS'e bağlanıldı (`@synsy/yiu-mobile-app`), Android preview APK başarıyla build edildi.
+- **Kalan (en son yapılacak):** güncel koddan yeni bir preview build daha alınıp gerçek cihazda
+  uçtan uca test edilmesi, store listing assetleri (ekran görüntüleri, açıklama metni — repo
+  dışı). Bkz. [`PLATFORM_IMPLEMENTATION_PLAN.md`](./PLATFORM_IMPLEMENTATION_PLAN.md) — bu adım
+  bilinçli olarak Faz 4'ten sonraya bırakıldı.
 
-### Phase 2 — Backend API
-- ASP.NET Core Web API projesi kurulacak.
-- PostgreSQL bağlantısı + EF Core migration altyapısı kurulacak.
-- JWT + Refresh Token auth sistemi (admin panel kullanıcıları için) kurulacak.
-- Faz 1 modülleri (bölüm 4) için public `/api/mobile/*` endpointleri yazılacak.
+### Phase 2 — Backend API *(iskelet kuruldu)*
+- `backend-api/` altında ASP.NET Core Web API (.NET 9) projesi, PostgreSQL/EF Core, JWT
+  middleware, CORS ve `/health` endpoint'i kuruldu — bkz. `backend-api/README.md`.
+- **Kalan:** gerçek modüller (Users/Roles/Announcements/Events/...) entity+DTO+service+controller
+  olarak tek tek implemente edilecek; Auth modülünün gerçek token üretimi yazılacak.
 
-### Phase 3 — Admin Panel
-- React admin panel kurulacak (ayrı repo veya monorepo — karar Faz 2 sonunda verilecek).
-- Duyuru, etkinlik, fırsat, slider ve kampüs içerikleri için CRUD ekranları.
-- Rol bazlı yetkilendirme (SuperAdmin/Admin/Editor/Viewer) eklenecek.
+### Phase 3 — Admin Panel *(iskelet kuruldu)*
+- `admin-panel/` altında React + TypeScript + Vite projesi, route yapısı ve 10 sayfanın boş
+  layoutları kuruldu — bkz. `admin-panel/README.md`.
+- **Kalan:** her sayfa gerçek CRUD ekranına dönüştürülecek (backend `/api/admin/*` hazır
+  olduktan sonra), rol bazlı yetkilendirme (SuperAdmin/Admin/Editor/Viewer) eklenecek.
 
 ### Phase 4 — Mobile API Integration
 - Mobil app'teki mock servisler (bölüm 6'daki tablo) tek tek gerçek API'ye geçirilecek.

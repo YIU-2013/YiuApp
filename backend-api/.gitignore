@@ -1,0 +1,22 @@
+# Build outputs
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+
+# Rider / VS
+.vs/
+.idea/
+*.DotSettings.user
+
+# EF Core
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets (appsettings.*.json içine asla gerçek secret yazılmaz, ama yine de)
+appsettings.*.local.json
+secrets.json
