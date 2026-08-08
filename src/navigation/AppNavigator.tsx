@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,9 +35,18 @@ const TAB_LABELS: Record<keyof RootTabParamList, string> = {
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-// İkon + label için gerçek içerik yüksekliği (safe-area/inset hariç)
-const TAB_BAR_CONTENT_HEIGHT = rs(40);
-const TAB_BAR_PADDING_TOP = rs(6);
+// İkon + label için ayrılan içerik alanı (safe-area/inset hariç) — ikon (24) +
+// label (satır yüksekliği ~14) + aralarındaki boşluklar rahatça sığacak kadar
+// geniş tutuluyor, aksi halde Android'de fontun ekstra satır boşluğu
+// (includeFontPadding) label'ı alttan kırpabiliyor.
+const TAB_ICON_SIZE = rs(24);
+const TAB_BAR_CONTENT_HEIGHT = rs(50);
+const TAB_BAR_PADDING_TOP = rs(8);
+// Sistem gesture/navigation bar'ı ile tab bar arasında her zaman görünür bir
+// nefes payı bırakmak için taban değer — insets.bottom bazı Android
+// cihazlarda (3 tuşlu nav bar, edge-to-edge kapalı) 0 dönebiliyor, bu durumda
+// tab bar sistem çubuğuna yapışık görünüyordu.
+const TAB_BAR_MIN_BOTTOM_INSET = rs(12);
 
 export default function AppNavigator() {
   // Android gesture/navigation bar ve iOS home-indicator yüksekliği cihazdan
@@ -45,9 +54,7 @@ export default function AppNavigator() {
   // kullanılıyor ki tab bar sistem çubuğuyla çakışmasın veya gereksiz
   // yüksek durmasın.
   const insets = useSafeAreaInsets();
-  const tabBarPaddingBottom = Platform.OS === 'ios'
-    ? Math.max(insets.bottom, rs(8))
-    : Math.max(insets.bottom, rs(10));
+  const tabBarPaddingBottom = Math.max(insets.bottom, TAB_BAR_MIN_BOTTOM_INSET);
   const tabBarHeight = TAB_BAR_CONTENT_HEIGHT + TAB_BAR_PADDING_TOP + tabBarPaddingBottom;
 
   return (
@@ -56,7 +63,7 @@ export default function AppNavigator() {
         tabBarIcon: ({ focused, color }) => {
           const name = route.name as keyof RootTabParamList;
           const icon = focused ? TAB_ICONS[name].active : TAB_ICONS[name].inactive;
-          return <Ionicons name={icon} size={rs(26)} color={color} />;
+          return <Ionicons name={icon} size={TAB_ICON_SIZE} color={color} />;
         },
         tabBarLabel: TAB_LABELS[route.name as keyof RootTabParamList],
         tabBarActiveTintColor: colors.primary,
@@ -66,6 +73,7 @@ export default function AppNavigator() {
           { height: tabBarHeight, paddingBottom: tabBarPaddingBottom },
         ],
         tabBarLabelStyle: styles.tabBarLabel,
+        tabBarIconStyle: styles.tabBarIcon,
         tabBarItemStyle: styles.tabBarItem,
         tabBarHideOnKeyboard: true,
         headerShown: true,
@@ -102,13 +110,19 @@ const styles = StyleSheet.create({
     ...shadows.tabBar,
   },
   tabBarLabel: {
-    fontSize: typography.sizes.xxs,
+    fontSize: typography.sizes.xs,
     fontWeight: typography.weights.semibold,
-    lineHeight: typography.sizes.xxs * 1.2,
+    lineHeight: typography.sizes.xs * 1.4,
     letterSpacing: typography.letterSpacing.wide,
     marginTop: rs(2),
+    marginBottom: 0,
+  },
+  tabBarIcon: {
+    marginTop: 0,
+    marginBottom: rs(2),
   },
   tabBarItem: {
+    height: TAB_BAR_CONTENT_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
   },
