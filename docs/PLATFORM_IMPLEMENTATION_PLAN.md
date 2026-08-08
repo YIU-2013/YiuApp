@@ -34,16 +34,19 @@ klasörler olarak eklendi, mevcut hiçbir mobil dosya taşınmadı/değiştirilm
 
 ## 2. Admin panel başlangıç planı
 
-**Durum: iskelet kuruldu, build geçiyor.**
+**Durum: frontend tamamlandı, mock veriyle çalışıyor — backend bekleniyor.**
 
 - `admin-panel/` — React + TypeScript + Vite, React Router ile 10 route, TanStack Query +
   Axios altyapısı kurulu (`src/api/client.ts`).
-- Şu an tüm sayfalar (Login hariç) `PagePlaceholder` gösteriyor — gerçek veri çekmiyor,
-  backend henüz hazır olmadığı için bilinçli olarak bağlanmadı.
-- **Sıradaki adım:** backend'de bir modülün `/api/admin/*` endpointleri hazır olduğunda, o
-  modülün admin panel sayfası gerçek CRUD ekranına dönüştürülecek (TanStack Query ile
-  `useQuery`/`useMutation`).
-- Detaylar için: `admin-panel/README.md`.
+- Login ve 7 içerik modülünde (Slider, Duyuru, Etkinlik, Fırsatlar, Kampüs İçerikleri,
+  Fakülte/Bölüm, İletişim Bilgileri) tam CRUD çalışıyor — ama veriler backend yerine
+  tarayıcının `localStorage`'ında (`src/api/mockClient.ts`) tutuluyor, çünkü backend henüz hazır
+  değil.
+- **Sıradaki adım:** backend'de bir modülün `/api/admin/*` endpointleri hazır olduğunda,
+  ilgili servis dosyasında (`src/services/*.ts`) `USE_MOCK_API` dalı devre dışı bırakılacak —
+  sayfa/komponent kodu değişmeyecek.
+- Detaylar için: `admin-panel/README.md`, backend sözleşmesi için
+  `docs/API_CONTRACT_FOR_BACKEND.md`.
 
 ## 3. Mobil entegrasyon ne zaman yapılacak
 

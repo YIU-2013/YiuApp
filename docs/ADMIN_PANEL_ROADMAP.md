@@ -261,11 +261,13 @@ DELETE /api/admin/opportunities/:id
 - **Kalan:** gerçek modüller (Users/Roles/Announcements/Events/...) entity+DTO+service+controller
   olarak tek tek implemente edilecek; Auth modülünün gerçek token üretimi yazılacak.
 
-### Phase 3 — Admin Panel *(iskelet kuruldu)*
-- `admin-panel/` altında React + TypeScript + Vite projesi, route yapısı ve 10 sayfanın boş
-  layoutları kuruldu — bkz. `admin-panel/README.md`.
-- **Kalan:** her sayfa gerçek CRUD ekranına dönüştürülecek (backend `/api/admin/*` hazır
-  olduktan sonra), rol bazlı yetkilendirme (SuperAdmin/Admin/Editor/Viewer) eklenecek.
+### Phase 3 — Admin Panel *(frontend tamamlandı, mock veriyle çalışıyor)*
+- `admin-panel/` altında React + TypeScript + Vite projesi; Login ve 7 içerik modülünde tam
+  CRUD (mock/localStorage üzerinden) çalışıyor — bkz. `admin-panel/README.md` ve
+  `docs/DEMO_GUIDE.md`.
+- **Kalan:** backend `/api/admin/*` hazır olduğunda `VITE_USE_MOCK_API=false` yapılıp servis
+  dosyalarındaki mock dalı devre dışı bırakılacak; rol bazlı yetkilendirme
+  (SuperAdmin/Admin/Editor/Viewer) backend tarafında uygulanacak.
 
 ### Phase 4 — Mobile API Integration
 - Mobil app'teki mock servisler (bölüm 6'daki tablo) tek tek gerçek API'ye geçirilecek.
