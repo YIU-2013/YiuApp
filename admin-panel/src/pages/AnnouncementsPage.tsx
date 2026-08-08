@@ -86,11 +86,11 @@ export default function AnnouncementsPage() {
       header: 'Başlık',
       render: (row) => (
         <div>
-          <div className="data-table__title">
+          <div className="data-table__title" title={row.title}>
             {row.pinned && '📌 '}
             {row.title}
           </div>
-          <div className="data-table__muted">{row.summary}</div>
+          <div className="data-table__muted" title={row.summary}>{row.summary}</div>
         </div>
       ),
     },
@@ -148,13 +148,13 @@ export default function AnnouncementsPage() {
         submitting={isMutating}
       >
         <div className="field">
-          <label htmlFor="ann-title">Title</label>
+          <label htmlFor="ann-title">Başlık</label>
           <input id="ann-title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
           {errors.title && <span className="field-error">{errors.title}</span>}
         </div>
 
         <div className="field">
-          <label htmlFor="ann-summary">Summary</label>
+          <label htmlFor="ann-summary">Özet</label>
           <textarea
             id="ann-summary"
             value={form.summary}
@@ -164,7 +164,7 @@ export default function AnnouncementsPage() {
         </div>
 
         <div className="field">
-          <label htmlFor="ann-content">Content</label>
+          <label htmlFor="ann-content">İçerik</label>
           <textarea
             id="ann-content"
             style={{ minHeight: 110 }}
@@ -176,7 +176,7 @@ export default function AnnouncementsPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="ann-category">Category</label>
+            <label htmlFor="ann-category">Kategori</label>
             <select
               id="ann-category"
               value={form.category}
@@ -190,7 +190,7 @@ export default function AnnouncementsPage() {
             </select>
           </div>
           <div className="field">
-            <label htmlFor="ann-image">Image URL</label>
+            <label htmlFor="ann-image">Görsel URL</label>
             <input
               id="ann-image"
               value={form.imageUrl ?? ''}
@@ -201,7 +201,7 @@ export default function AnnouncementsPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="ann-published">Published At</label>
+            <label htmlFor="ann-published">Yayın Tarihi</label>
             <input
               id="ann-published"
               type="date"
@@ -218,7 +218,7 @@ export default function AnnouncementsPage() {
                 checked={form.pinned}
                 onChange={(e) => setForm({ ...form, pinned: e.target.checked })}
               />
-              <label htmlFor="ann-pinned">Pinned</label>
+              <label htmlFor="ann-pinned">Sabitlenmiş</label>
             </div>
             <div className="field checkbox-field">
               <input
@@ -227,7 +227,7 @@ export default function AnnouncementsPage() {
                 checked={form.active}
                 onChange={(e) => setForm({ ...form, active: e.target.checked })}
               />
-              <label htmlFor="ann-active">Active</label>
+              <label htmlFor="ann-active">Aktif</label>
             </div>
           </div>
         </div>

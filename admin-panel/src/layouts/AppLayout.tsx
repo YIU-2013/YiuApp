@@ -18,10 +18,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/settings', label: 'Ayarlar' },
 ];
 
-/**
- * Giriş yapılmış admin panel sayfalarını saran kabuk: yan menü + içerik alanı.
- * Yetkilendirme (route guard) Faz-2'de Auth modülüyle birlikte eklenecek.
- */
+/** Giriş yapılmış admin panel sayfalarını saran kabuk: yan menü + içerik alanı. */
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();

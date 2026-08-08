@@ -80,8 +80,8 @@ export default function CampusContentsPage() {
       header: 'Başlık',
       render: (row) => (
         <div>
-          <div className="data-table__title">{row.title}</div>
-          <div className="data-table__muted">{row.description}</div>
+          <div className="data-table__title" title={row.title}>{row.title}</div>
+          <div className="data-table__muted" title={row.description}>{row.description}</div>
         </div>
       ),
     },
@@ -136,13 +136,13 @@ export default function CampusContentsPage() {
         submitting={isMutating}
       >
         <div className="field">
-          <label htmlFor="camp-title">Title</label>
+          <label htmlFor="camp-title">Başlık</label>
           <input id="camp-title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
           {errors.title && <span className="field-error">{errors.title}</span>}
         </div>
 
         <div className="field">
-          <label htmlFor="camp-description">Description</label>
+          <label htmlFor="camp-description">Açıklama</label>
           <textarea
             id="camp-description"
             value={form.description}
@@ -163,7 +163,7 @@ export default function CampusContentsPage() {
             {errors.icon && <span className="field-error">{errors.icon}</span>}
           </div>
           <div className="field">
-            <label htmlFor="camp-category">Category</label>
+            <label htmlFor="camp-category">Kategori</label>
             <input
               id="camp-category"
               list="camp-category-suggestions"
@@ -180,7 +180,7 @@ export default function CampusContentsPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="camp-sort">Sort Order</label>
+            <label htmlFor="camp-sort">Sıra Numarası</label>
             <input
               id="camp-sort"
               type="number"
@@ -195,7 +195,7 @@ export default function CampusContentsPage() {
               checked={form.active}
               onChange={(e) => setForm({ ...form, active: e.target.checked })}
             />
-            <label htmlFor="camp-active">Active</label>
+            <label htmlFor="camp-active">Aktif</label>
           </div>
         </div>
       </FormModal>

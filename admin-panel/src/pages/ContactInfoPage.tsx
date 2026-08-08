@@ -42,10 +42,10 @@ export default function ContactInfoPage() {
     <div>
       <PageHeader title="İletişim Bilgileri" description="Mobil uygulamadaki İletişim ekranının içerikleri" />
 
-      <div className="page-placeholder" style={{ maxWidth: 560 }}>
+      <div className="card">
         <div className="form-grid">
           <div className="field">
-            <label htmlFor="ci-phone">General Phone</label>
+            <label htmlFor="ci-phone">Genel Telefon</label>
             <input
               id="ci-phone"
               value={form.generalPhone}
@@ -55,7 +55,7 @@ export default function ContactInfoPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="ci-email">General Email</label>
+            <label htmlFor="ci-email">Genel E-posta</label>
             <input
               id="ci-email"
               type="email"
@@ -66,7 +66,7 @@ export default function ContactInfoPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="ci-address">Address</label>
+            <label htmlFor="ci-address">Adres</label>
             <textarea
               id="ci-address"
               value={form.address}
@@ -76,7 +76,7 @@ export default function ContactInfoPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="ci-map">Map URL</label>
+            <label htmlFor="ci-map">Harita URL</label>
             <input
               id="ci-map"
               value={form.mapUrl ?? ''}
@@ -86,7 +86,7 @@ export default function ContactInfoPage() {
 
           <div className="form-row">
             <div className="field">
-              <label htmlFor="ci-sa-phone">Student Affairs Phone</label>
+              <label htmlFor="ci-sa-phone">Öğrenci İşleri Telefonu</label>
               <input
                 id="ci-sa-phone"
                 value={form.studentAffairsPhone}
@@ -94,7 +94,7 @@ export default function ContactInfoPage() {
               />
             </div>
             <div className="field">
-              <label htmlFor="ci-sa-email">Student Affairs Email</label>
+              <label htmlFor="ci-sa-email">Öğrenci İşleri E-postası</label>
               <input
                 id="ci-sa-email"
                 type="email"
@@ -105,7 +105,7 @@ export default function ContactInfoPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="ci-support">Support Text</label>
+            <label htmlFor="ci-support">Destek Metni</label>
             <textarea
               id="ci-support"
               value={form.supportText}

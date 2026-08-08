@@ -82,8 +82,8 @@ export default function OpportunitiesPage() {
       header: 'Başlık',
       render: (row) => (
         <div>
-          <div className="data-table__title">{row.title}</div>
-          <div className="data-table__muted">{row.description}</div>
+          <div className="data-table__title" title={row.title}>{row.title}</div>
+          <div className="data-table__muted" title={row.description}>{row.description}</div>
         </div>
       ),
     },
@@ -137,13 +137,13 @@ export default function OpportunitiesPage() {
         submitting={isMutating}
       >
         <div className="field">
-          <label htmlFor="opp-title">Title</label>
+          <label htmlFor="opp-title">Başlık</label>
           <input id="opp-title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
           {errors.title && <span className="field-error">{errors.title}</span>}
         </div>
 
         <div className="field">
-          <label htmlFor="opp-description">Description</label>
+          <label htmlFor="opp-description">Açıklama</label>
           <textarea
             id="opp-description"
             value={form.description}
@@ -154,7 +154,7 @@ export default function OpportunitiesPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="opp-category">Category</label>
+            <label htmlFor="opp-category">Kategori</label>
             <select
               id="opp-category"
               value={form.category}
@@ -168,7 +168,7 @@ export default function OpportunitiesPage() {
             </select>
           </div>
           <div className="field">
-            <label htmlFor="opp-badge">Badge</label>
+            <label htmlFor="opp-badge">Rozet</label>
             <input
               id="opp-badge"
               value={form.badge ?? ''}
@@ -178,7 +178,7 @@ export default function OpportunitiesPage() {
         </div>
 
         <div className="field">
-          <label htmlFor="opp-image">Image URL</label>
+          <label htmlFor="opp-image">Görsel URL</label>
           <input
             id="opp-image"
             value={form.imageUrl ?? ''}
@@ -188,7 +188,7 @@ export default function OpportunitiesPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="opp-action-label">Action Label</label>
+            <label htmlFor="opp-action-label">Buton Metni</label>
             <input
               id="opp-action-label"
               value={form.actionLabel ?? ''}
@@ -196,7 +196,7 @@ export default function OpportunitiesPage() {
             />
           </div>
           <div className="field">
-            <label htmlFor="opp-action-url">Action URL</label>
+            <label htmlFor="opp-action-url">Buton URL</label>
             <input
               id="opp-action-url"
               value={form.actionUrl ?? ''}
@@ -207,7 +207,7 @@ export default function OpportunitiesPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="opp-sort">Sort Order</label>
+            <label htmlFor="opp-sort">Sıra Numarası</label>
             <input
               id="opp-sort"
               type="number"
@@ -222,7 +222,7 @@ export default function OpportunitiesPage() {
               checked={form.active}
               onChange={(e) => setForm({ ...form, active: e.target.checked })}
             />
-            <label htmlFor="opp-active">Active</label>
+            <label htmlFor="opp-active">Aktif</label>
           </div>
         </div>
       </FormModal>

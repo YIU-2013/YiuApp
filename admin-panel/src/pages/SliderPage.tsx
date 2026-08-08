@@ -86,8 +86,8 @@ export default function SliderPage() {
       header: 'Başlık',
       render: (row) => (
         <div>
-          <div className="data-table__title">{row.title}</div>
-          <div className="data-table__muted">{row.description}</div>
+          <div className="data-table__title" title={row.title}>{row.title}</div>
+          <div className="data-table__muted" title={row.description}>{row.description}</div>
         </div>
       ),
     },
@@ -141,7 +141,7 @@ export default function SliderPage() {
         submitting={isMutating}
       >
         <div className="field">
-          <label htmlFor="slide-title">Title</label>
+          <label htmlFor="slide-title">Başlık</label>
           <input
             id="slide-title"
             value={form.title}
@@ -151,7 +151,7 @@ export default function SliderPage() {
         </div>
 
         <div className="field">
-          <label htmlFor="slide-description">Description</label>
+          <label htmlFor="slide-description">Açıklama</label>
           <textarea
             id="slide-description"
             value={form.description}
@@ -162,7 +162,7 @@ export default function SliderPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="slide-badge">Badge</label>
+            <label htmlFor="slide-badge">Rozet</label>
             <input
               id="slide-badge"
               value={form.badge ?? ''}
@@ -170,7 +170,7 @@ export default function SliderPage() {
             />
           </div>
           <div className="field">
-            <label htmlFor="slide-type">Type</label>
+            <label htmlFor="slide-type">Tip</label>
             <select
               id="slide-type"
               value={form.type}
@@ -187,7 +187,7 @@ export default function SliderPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="slide-cta">CTA Label</label>
+            <label htmlFor="slide-cta">CTA Metni</label>
             <input
               id="slide-cta"
               value={form.ctaLabel ?? ''}
@@ -195,7 +195,7 @@ export default function SliderPage() {
             />
           </div>
           <div className="field">
-            <label htmlFor="slide-image">Image URL</label>
+            <label htmlFor="slide-image">Görsel URL</label>
             <input
               id="slide-image"
               value={form.imageUrl ?? ''}
@@ -206,7 +206,7 @@ export default function SliderPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="slide-target-type">Target Type</label>
+            <label htmlFor="slide-target-type">Hedef Tipi</label>
             <select
               id="slide-target-type"
               value={form.targetType ?? ''}
@@ -223,7 +223,7 @@ export default function SliderPage() {
             </select>
           </div>
           <div className="field">
-            <label htmlFor="slide-target-id">Target ID</label>
+            <label htmlFor="slide-target-id">Hedef ID</label>
             <input
               id="slide-target-id"
               value={form.targetId ?? ''}
@@ -234,7 +234,7 @@ export default function SliderPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="slide-sort">Sort Order</label>
+            <label htmlFor="slide-sort">Sıra Numarası</label>
             <input
               id="slide-sort"
               type="number"
@@ -250,13 +250,13 @@ export default function SliderPage() {
               checked={form.active}
               onChange={(e) => setForm({ ...form, active: e.target.checked })}
             />
-            <label htmlFor="slide-active">Active</label>
+            <label htmlFor="slide-active">Aktif</label>
           </div>
         </div>
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="slide-starts">Starts At</label>
+            <label htmlFor="slide-starts">Başlangıç Tarihi</label>
             <input
               id="slide-starts"
               type="date"
@@ -265,7 +265,7 @@ export default function SliderPage() {
             />
           </div>
           <div className="field">
-            <label htmlFor="slide-ends">Ends At</label>
+            <label htmlFor="slide-ends">Bitiş Tarihi</label>
             <input
               id="slide-ends"
               type="date"

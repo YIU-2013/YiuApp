@@ -127,8 +127,8 @@ export default function FacultiesPage() {
       header: 'Fakülte',
       render: (row) => (
         <div>
-          <div className="data-table__title">{row.name}</div>
-          <div className="data-table__muted">{row.dean}</div>
+          <div className="data-table__title" title={row.name}>{row.name}</div>
+          <div className="data-table__muted" title={row.dean}>{row.dean}</div>
         </div>
       ),
     },
@@ -159,7 +159,7 @@ export default function FacultiesPage() {
       header: 'Bölüm / Program',
       render: (row) => (
         <div>
-          <div className="data-table__title">{row.name}</div>
+          <div className="data-table__title" title={row.name}>{row.name}</div>
           <div className="data-table__muted">{facultyNameById.get(row.facultyId) ?? '—'}</div>
         </div>
       ),
@@ -273,12 +273,12 @@ export default function FacultiesPage() {
         submitting={faculties.isMutating}
       >
         <div className="field">
-          <label htmlFor="fac-name">Name</label>
+          <label htmlFor="fac-name">Ad</label>
           <input id="fac-name" value={facForm.name} onChange={(e) => setFacForm({ ...facForm, name: e.target.value })} />
           {facErrors.name && <span className="field-error">{facErrors.name}</span>}
         </div>
         <div className="field">
-          <label htmlFor="fac-description">Description</label>
+          <label htmlFor="fac-description">Açıklama</label>
           <textarea
             id="fac-description"
             value={facForm.description}
@@ -296,14 +296,14 @@ export default function FacultiesPage() {
             />
           </div>
           <div className="field">
-            <label htmlFor="fac-dean">Dean</label>
+            <label htmlFor="fac-dean">Dekan</label>
             <input id="fac-dean" value={facForm.dean} onChange={(e) => setFacForm({ ...facForm, dean: e.target.value })} />
             {facErrors.dean && <span className="field-error">{facErrors.dean}</span>}
           </div>
         </div>
         <div className="form-row">
           <div className="field">
-            <label htmlFor="fac-email">Contact Email</label>
+            <label htmlFor="fac-email">İletişim E-postası</label>
             <input
               id="fac-email"
               type="email"
@@ -312,7 +312,7 @@ export default function FacultiesPage() {
             />
           </div>
           <div className="field">
-            <label htmlFor="fac-sort">Sort Order</label>
+            <label htmlFor="fac-sort">Sıra Numarası</label>
             <input
               id="fac-sort"
               type="number"
@@ -328,7 +328,7 @@ export default function FacultiesPage() {
             checked={facForm.active}
             onChange={(e) => setFacForm({ ...facForm, active: e.target.checked })}
           />
-          <label htmlFor="fac-active">Active</label>
+          <label htmlFor="fac-active">Aktif</label>
         </div>
       </FormModal>
 
@@ -341,7 +341,7 @@ export default function FacultiesPage() {
         submitting={departments.isMutating}
       >
         <div className="field">
-          <label htmlFor="dep-faculty">Faculty</label>
+          <label htmlFor="dep-faculty">Fakülte</label>
           <select
             id="dep-faculty"
             value={depForm.facultyId}
@@ -356,13 +356,13 @@ export default function FacultiesPage() {
           {depErrors.facultyId && <span className="field-error">{depErrors.facultyId}</span>}
         </div>
         <div className="field">
-          <label htmlFor="dep-name">Name</label>
+          <label htmlFor="dep-name">Ad</label>
           <input id="dep-name" value={depForm.name} onChange={(e) => setDepForm({ ...depForm, name: e.target.value })} />
           {depErrors.name && <span className="field-error">{depErrors.name}</span>}
         </div>
         <div className="form-row">
           <div className="field">
-            <label htmlFor="dep-degree">Degree Type</label>
+            <label htmlFor="dep-degree">Derece Türü</label>
             <select
               id="dep-degree"
               value={depForm.degreeType}
@@ -374,7 +374,7 @@ export default function FacultiesPage() {
             </select>
           </div>
           <div className="field">
-            <label htmlFor="dep-duration">Duration (yıl)</label>
+            <label htmlFor="dep-duration">Süre (Yıl)</label>
             <input
               id="dep-duration"
               type="number"
@@ -385,7 +385,7 @@ export default function FacultiesPage() {
           </div>
         </div>
         <div className="field">
-          <label htmlFor="dep-language">Language</label>
+          <label htmlFor="dep-language">Dil</label>
           <input
             id="dep-language"
             value={depForm.language}
@@ -393,7 +393,7 @@ export default function FacultiesPage() {
           />
         </div>
         <div className="field">
-          <label htmlFor="dep-description">Description</label>
+          <label htmlFor="dep-description">Açıklama</label>
           <textarea
             id="dep-description"
             value={depForm.description}
@@ -407,7 +407,7 @@ export default function FacultiesPage() {
             checked={depForm.active}
             onChange={(e) => setDepForm({ ...depForm, active: e.target.checked })}
           />
-          <label htmlFor="dep-active">Active</label>
+          <label htmlFor="dep-active">Aktif</label>
         </div>
       </FormModal>
 

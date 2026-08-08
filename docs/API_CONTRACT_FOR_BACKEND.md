@@ -112,6 +112,14 @@ Sonraki tüm `/api/admin/*` istekleri `Authorization: Bearer <token>` header'ı 
 Admin panelin şu anki mock auth'u (`admin-panel/src/services/authService.ts`) bu sözleşmeye
 göre yazıldı — backend gelince yalnızca mock dalı kaldırılacak, arayüz değişmeyecek.
 
+**Mevcut admin panel kapsamı (bilgi amaçlı):** Şu an yalnızca `POST /api/auth/login` client
+tarafında kablolanmış durumda. `POST /api/auth/refresh` ve `POST /api/auth/logout` bu dokümanda
+tanımlı ama admin panel henüz bunları çağırmıyor — çıkış işlemi şu an yalnızca token'ı
+`localStorage`'dan silip client-side yönlendirme yapıyor. Backend bu iki endpoint'i kontrata göre
+sağlamalı; admin panelin onları gerçekten çağırması, gerçek `/api/auth/login`'e bağlanılacağı
+fazda yapılacak. Login response'undaki `refreshToken` alanı da aynı nedenle admin panel
+tarafında henüz saklanmıyor.
+
 **AdminUser:**
 ```json
 {

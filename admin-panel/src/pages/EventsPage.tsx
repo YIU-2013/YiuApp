@@ -88,8 +88,8 @@ export default function EventsPage() {
       header: 'Başlık',
       render: (row) => (
         <div>
-          <div className="data-table__title">{row.title}</div>
-          <div className="data-table__muted">{row.location}</div>
+          <div className="data-table__title" title={row.title}>{row.title}</div>
+          <div className="data-table__muted" title={row.location}>{row.location}</div>
         </div>
       ),
     },
@@ -159,13 +159,13 @@ export default function EventsPage() {
         submitting={isMutating}
       >
         <div className="field">
-          <label htmlFor="evt-title">Title</label>
+          <label htmlFor="evt-title">Başlık</label>
           <input id="evt-title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
           {errors.title && <span className="field-error">{errors.title}</span>}
         </div>
 
         <div className="field">
-          <label htmlFor="evt-description">Description</label>
+          <label htmlFor="evt-description">Açıklama</label>
           <textarea
             id="evt-description"
             value={form.description}
@@ -175,7 +175,7 @@ export default function EventsPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="evt-location">Location</label>
+            <label htmlFor="evt-location">Konum</label>
             <input
               id="evt-location"
               value={form.location}
@@ -184,7 +184,7 @@ export default function EventsPage() {
             {errors.location && <span className="field-error">{errors.location}</span>}
           </div>
           <div className="field">
-            <label htmlFor="evt-date">Event Date</label>
+            <label htmlFor="evt-date">Etkinlik Tarihi</label>
             <input
               id="evt-date"
               type="date"
@@ -197,7 +197,7 @@ export default function EventsPage() {
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="evt-image">Image URL</label>
+            <label htmlFor="evt-image">Görsel URL</label>
             <input
               id="evt-image"
               value={form.imageUrl ?? ''}
@@ -205,7 +205,7 @@ export default function EventsPage() {
             />
           </div>
           <div className="field">
-            <label htmlFor="evt-category">Category</label>
+            <label htmlFor="evt-category">Kategori</label>
             <input
               id="evt-category"
               value={form.category ?? ''}
@@ -221,7 +221,7 @@ export default function EventsPage() {
             checked={form.active}
             onChange={(e) => setForm({ ...form, active: e.target.checked })}
           />
-          <label htmlFor="evt-active">Active</label>
+          <label htmlFor="evt-active">Aktif</label>
         </div>
       </FormModal>
 

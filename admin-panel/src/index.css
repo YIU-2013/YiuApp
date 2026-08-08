@@ -169,6 +169,15 @@ button {
   font-weight: 600;
 }
 
+/* ─── Generic content card (forms, panels) ──────────────────────────────── */
+.card {
+  max-width: 560px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+}
+
 /* ─── Login ──────────────────────────────────────────────────────────────── */
 .login-page {
   min-height: 100vh;
@@ -373,11 +382,19 @@ button {
 .data-table__title {
   font-weight: 600;
   color: var(--text);
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .data-table__muted {
   color: var(--text-faint);
   font-size: 12px;
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .data-table__actions {
@@ -418,6 +435,9 @@ button {
 
 /* ─── Empty / loading / error states ────────────────────────────────────── */
 .state-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   padding: 48px 24px;
   text-align: center;
   color: var(--text-muted);
@@ -582,20 +602,25 @@ button {
 .stat-card {
   background: var(--surface);
   border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
   border-radius: 12px;
   padding: 18px;
 }
 
 .stat-card__value {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--primary);
+  line-height: 1.2;
 }
 
 .stat-card__label {
   font-size: 12px;
+  font-weight: 600;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .dashboard-columns {
@@ -640,4 +665,43 @@ button {
 .dashboard-list li:last-child {
   border-bottom: none;
   padding-bottom: 0;
+}
+
+.dashboard-list li > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.dashboard-list li > span:last-child {
+  flex-shrink: 0;
+}
+
+/* ─── Responsive safety net ──────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .app-sidebar {
+    width: 100%;
+  }
+
+  .app-content {
+    padding: 20px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .data-table__title,
+  .data-table__muted {
+    max-width: 220px;
+  }
 }
