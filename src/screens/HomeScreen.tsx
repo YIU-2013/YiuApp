@@ -16,7 +16,7 @@ import ScreenWrapper from '../components/ScreenWrapper';
 import Card from '../components/Card';
 import TouchableScale from '../components/TouchableScale';
 import ScreenHeader from '../components/ScreenHeader';
-import StudentIdentityCard from '../components/StudentIdentityCard';
+import CampusLifeCard from '../components/CampusLifeCard';
 import CampusQuickActions, { QuickActionItem } from '../components/CampusQuickActions';
 import FeaturedSlider, { FeaturedSlide } from '../components/FeaturedSlider';
 import {
@@ -45,7 +45,7 @@ type Nav = CompositeNavigationProp<
 
 type HomeItem =
   | { _t: 'FEATURED' }
-  | { _t: 'IDENTITY' }
+  | { _t: 'CAMPUS_LIFE' }
   | { _t: 'QUICK' }
   | { _t: 'ANNO_HEADER' }
   | { _t: 'ANNO'; item: Announcement }
@@ -198,7 +198,7 @@ export default function HomeScreen() {
   const items = useMemo<HomeItem[]>(() => {
     const list: HomeItem[] = [
       { _t: 'FEATURED' },
-      { _t: 'IDENTITY' },
+      { _t: 'CAMPUS_LIFE' },
       { _t: 'QUICK' },
       { _t: 'ANNO_HEADER' },
     ];
@@ -253,7 +253,7 @@ export default function HomeScreen() {
     ({ item }: { item: HomeItem }) => {
       switch (item._t) {
         case 'FEATURED':    return <FeaturedSlider slides={featuredSlides} />;
-        case 'IDENTITY':    return <StudentIdentityCard />;
+        case 'CAMPUS_LIFE': return <CampusLifeCard onPress={() => nav.navigate('Campus')} />;
         case 'QUICK':       return <CampusQuickActions title="Hızlı Erişim" items={quickActionItems} />;
         case 'ANNO_HEADER': return (
           <SectionHeader title="Son Duyurular" onSeeAll={() => {}} />

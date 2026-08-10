@@ -43,7 +43,7 @@ const TYPE_META: Record<FeaturedSlideType, { bg: string; icon: IoniconName; badg
  * Ana Sayfa'da (ve gerekirse başka ekranlarda) öğrenciye özel öne çıkan
  * içerikleri (duyuru/etkinlik/fırsat/kampüs) gösteren yatay kaydırmalı,
  * data-driven slider. Görsel yoksa type'a göre tema renkli, dekoratif
- * katmanlı "premium" kart (VideoCard/StudentIdentityCard ile aynı
+ * katmanlı "premium" kart (VideoCard/CampusLifeCard ile aynı
  * görsel dil) fallback olarak kullanılır.
  *
  * Boş `slides` dizisi güvenle ele alınır (render edilmez, hata atmaz).
@@ -98,7 +98,7 @@ export default function FeaturedSlider({ slides }: FeaturedSliderProps) {
               onPress={slide.onPress}
               style={[
                 s.card,
-                shadows.md,
+                shadows.lg,
                 { width: CARD_W, marginRight: isLast ? 0 : GAP, backgroundColor: meta.bg },
               ]}
             >
@@ -139,10 +139,12 @@ const s = StyleSheet.create({
 
   card: {
     height: rs(160),
-    borderRadius: rs(18),
+    borderRadius: rs(20),
     padding: spacing.base,
     overflow: 'hidden',
     justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
   },
   circleLg: {
     position: 'absolute',
@@ -183,16 +185,26 @@ const s = StyleSheet.create({
     color: colors.textInverse,
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.bold,
+    letterSpacing: typography.letterSpacing.tight,
     lineHeight: typography.sizes.md * typography.lineHeights.snug,
     marginTop: spacing.sm,
   },
   desc: {
-    color: 'rgba(255,255,255,0.82)',
+    color: 'rgba(255,255,255,0.85)',
     fontSize: typography.sizes.xs,
     lineHeight: typography.sizes.xs * typography.lineHeights.normal,
     marginTop: rs(2),
   },
-  ctaRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  ctaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderRadius: rs(100),
+    paddingHorizontal: spacing.sm,
+    paddingVertical: rs(5),
+  },
   ctaText: {
     color: colors.textInverse,
     fontSize: typography.sizes.xs,
