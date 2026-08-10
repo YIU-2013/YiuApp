@@ -52,29 +52,54 @@ const TYPE_META: Record<FeaturedSlideType, { accent: string; icon: IoniconName; 
   campus:       { accent: colors.info,    icon: 'compass-outline',   badge: 'Kampüs',    cta: 'Keşfet' },
 };
 
-/** Fotoğrafın üstünde metni okunaklı kılan, alta doğru koyulaşan lacivert
- * scrim — gerçek gradient kütüphanesi olmadan (yeni dependency yasak)
- * kademeli opaklık bantlarıyla simüle ediliyor. */
-function GradientScrim() {
+// Gerçek bir gradient kütüphanesi olmadan (yeni dependency yasak), çok
+// sayıda ince bant üst üste dizilip her birinin opaklığı bir öncekinden
+// yalnızca birkaç puan farklı tutularak "pürüzsüz" bir gradient hissi
+// simüle ediliyor. Az sayıda (3-4) kalın bant kullanmak sert kenarlı,
+// "yatay çizgi/bant" gibi görünen kötü bir sonuç veriyordu — bu yüzden
+// adım sayısı yüksek tutuluyor.
+const BAND_STEPS = 16;
+function buildOpacitySteps(max: number, exponent = 1.7): number[] {
+  return Array.from({ length: BAND_STEPS }, (_, i) => {
+    const t = i / (BAND_STEPS - 1);
+    return +(max * Math.pow(t, exponent)).toFixed(3);
+  });
+}
+
+function GradientBands({ rgb, opacities }: { rgb: string; opacities: number[] }) {
+  const stepPct = 100 / opacities.length;
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={[s.band, { top: '0%',  height: '38%', backgroundColor: 'rgba(7,27,66,0.05)' }]} />
-      <View style={[s.band, { top: '38%', height: '22%', backgroundColor: 'rgba(7,27,66,0.30)' }]} />
-      <View style={[s.band, { top: '60%', height: '20%', backgroundColor: 'rgba(7,27,66,0.58)' }]} />
-      <View style={[s.band, { top: '80%', height: '20%', backgroundColor: 'rgba(7,27,66,0.80)' }]} />
+      {opacities.map((o, i) => (
+        <View
+          key={i}
+          style={[
+            s.band,
+            { top: `${i * stepPct}%`, height: `${stepPct + 0.5}%`, backgroundColor: `rgba(${rgb},${o})` },
+          ]}
+        />
+      ))}
     </View>
   );
 }
 
+// Fotoğrafın üstünde metni okunaklı kılan, alta doğru koyulaşan lacivert
+// scrim (navy950 tonu).
+const SCRIM_OPACITIES = buildOpacitySteps(0.82);
 /** Fotoğraf yokken kullanılan, düz tek renk yerine geçen soft gradient
- * dolgu — açık lacivertten koyu laciverte kademeli geçiş. */
+ * dolgu — açık lacivertten koyu laciverte pürüzsüz geçiş. */
+const FILL_OPACITIES = buildOpacitySteps(0.9, 1.4);
+
+function GradientScrim() {
+  return <GradientBands rgb="7,27,66" opacities={SCRIM_OPACITIES} />;
+}
+
 function GradientFill() {
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={[s.band, { top: '0%',  height: '30%', backgroundColor: '#2D5BAB' }]} />
-      <View style={[s.band, { top: '30%', height: '25%', backgroundColor: 'rgba(11,46,107,0.92)' }]} />
-      <View style={[s.band, { top: '55%', height: '45%', backgroundColor: colors.primary }]} />
-    </View>
+    <>
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: '#3D6BC0' }]} pointerEvents="none" />
+      <GradientBands rgb="11,46,107" opacities={FILL_OPACITIES} />
+    </>
   );
 }
 
@@ -140,7 +165,7 @@ export default function FeaturedSlider({ slides }: FeaturedSliderProps) {
 
               <View style={s.bottomBlock}>
                 <Text style={s.title} numberOfLines={2}>{slide.title}</Text>
-                <Text style={s.desc} numberOfLines={1}>{slide.description}</Text>
+                <Text style={s.desc} numberOfLines={2}>{slide.description}</Text>
 
                 <View style={s.ctaRow}>
                   <Text style={s.ctaText}>{slide.ctaLabel ?? meta.cta}</Text>
@@ -164,6 +189,13 @@ export default function FeaturedSlider({ slides }: FeaturedSliderProps) {
               ) : (
                 <View style={s.card}>
                   <GradientFill />
+                  <Ionicons
+                    name={meta.icon}
+                    size={rs(120)}
+                    color="rgba(255,255,255,0.12)"
+                    style={s.watermarkIcon}
+                    pointerEvents="none"
+                  />
                   {content}
                 </View>
               )}
@@ -188,7 +220,7 @@ const s = StyleSheet.create({
   scrollContent: { paddingRight: spacing.base },
 
   cardShell: {
-    height: rs(176),
+    height: rs(192),
     borderRadius: rs(20),
   },
   card: {
@@ -205,6 +237,11 @@ const s = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
+  },
+  watermarkIcon: {
+    position: 'absolute',
+    top: -rs(20),
+    right: -rs(20),
   },
 
   badgeRow: {

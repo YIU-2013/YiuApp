@@ -49,7 +49,7 @@ export default function CampusQuickActions({ title, items }: CampusQuickActionsP
                 <MaterialCommunityIcons name={item.icon} size={rs(19)} color={colors.primary} />
               </View>
               <View style={s.textWrap}>
-                <Text style={s.label} numberOfLines={1}>{item.label}</Text>
+                <Text style={s.label} numberOfLines={2}>{item.label}</Text>
                 {item.description && (
                   <Text style={s.desc} numberOfLines={1}>{item.description}</Text>
                 )}
@@ -72,7 +72,7 @@ const s = StyleSheet.create({
     marginBottom: spacing.md,
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  card: { height: rs(74), borderRadius: rs(16) },
+  card: { height: rs(80), borderRadius: rs(16) },
   cardInner: {
     width: '100%',
     height: '100%',
@@ -95,6 +95,7 @@ const s = StyleSheet.create({
     fontSize: typography.sizes.sm,
     fontWeight: typography.weights.semibold,
     color: colors.textPrimary,
+    lineHeight: typography.sizes.sm * typography.lineHeights.snug,
   },
   desc: {
     fontSize: typography.sizes.xxs,

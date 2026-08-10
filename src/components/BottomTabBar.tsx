@@ -33,9 +33,12 @@ const BAR_HEIGHT = rs(60);
 const BAR_MARGIN_H = rs(16);
 const BAR_RADIUS = rs(24);
 const TOP_GAP = rs(10);
-// "safe area + 10" — sistem gesture/navigation bar'ı ile floating bar
-// arasında her zaman görünür bir boşluk bırakır.
-const MIN_BOTTOM_GAP = rs(10);
+// Sistem gesture/navigation bar'ı ile floating bar arasına eklenen ekstra
+// boşluk — insets.bottom'ın üzerine binerek bar'ı sistem çubuğundan
+// gözle görülür şekilde ayırır. Yalnızca insets.bottom'ı kullanmak
+// (ör. Math.max(insets.bottom, X)) bazı cihazlarda bar'ı safe-area
+// sınırına tam yapıştırıyor, ekstra "nefes payı" bırakmıyordu.
+const EXTRA_BOTTOM_GAP = rs(18);
 
 /**
  * Floating görünen bottom tab bar.
@@ -52,7 +55,7 @@ const MIN_BOTTOM_GAP = rs(10);
  */
 export default function BottomTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const bottomGap = insets.bottom + MIN_BOTTOM_GAP;
+  const bottomGap = insets.bottom + EXTRA_BOTTOM_GAP;
 
   return (
     <View style={[styles.outer, { paddingTop: TOP_GAP, paddingBottom: bottomGap }]}>
