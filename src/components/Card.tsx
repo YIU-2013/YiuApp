@@ -52,5 +52,7 @@ export default function Card({
 const styles = StyleSheet.create({
   base: {
     overflow: 'visible', // Android shadow için gerekli
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.borderSubtle,
   },
 });

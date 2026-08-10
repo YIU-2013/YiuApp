@@ -50,12 +50,10 @@ const TYPE_META: Record<FeaturedSlideType, { bg: string; icon: IoniconName; badg
  */
 export default function FeaturedSlider({ slides }: FeaturedSliderProps) {
   const { width } = useResponsive();
-  // HomeScreen (ve bu component'in kullanılacağı her ekran) içeriği
-  // spacing.base yatay padding ile sarmalanıyor — kart genişliğini tüm
-  // ekran genişliğine göre değil, o gerçek görünür alana göre hesapla.
-  // Aksi halde ikinci kart konteynerin dışına taşıp fena kesiliyordu.
-  const CONTAINER_W = width - spacing.base * 2;
-  const CARD_W = Math.round(CONTAINER_W * 0.86);
+  // Kart genişliği ekran genişliğinin (container değil) %83'ü — sağda
+  // görünen bir sonraki kartın "preview" payı bilinçli olarak dar
+  // tutuluyor, aksi halde ikinci (kırmızı) kart fazla baskın görünüyordu.
+  const CARD_W = Math.round(width * 0.83);
   const GAP = spacing.sm;
   const SNAP = CARD_W + GAP;
 
@@ -98,7 +96,7 @@ export default function FeaturedSlider({ slides }: FeaturedSliderProps) {
               onPress={slide.onPress}
               style={[
                 s.card,
-                shadows.lg,
+                shadows.md,
                 { width: CARD_W, marginRight: isLast ? 0 : GAP, backgroundColor: meta.bg },
               ]}
             >
@@ -111,7 +109,7 @@ export default function FeaturedSlider({ slides }: FeaturedSliderProps) {
               </View>
 
               <Text style={s.title} numberOfLines={2}>{slide.title}</Text>
-              <Text style={s.desc} numberOfLines={2}>{slide.description}</Text>
+              <Text style={s.desc} numberOfLines={1}>{slide.description}</Text>
 
               <View style={s.ctaRow}>
                 <Text style={s.ctaText}>{slide.ctaLabel ?? meta.cta}</Text>
@@ -138,7 +136,7 @@ const s = StyleSheet.create({
   scrollContent: { paddingRight: spacing.base },
 
   card: {
-    height: rs(160),
+    height: rs(142),
     borderRadius: rs(20),
     padding: spacing.base,
     overflow: 'hidden',
@@ -148,21 +146,21 @@ const s = StyleSheet.create({
   },
   circleLg: {
     position: 'absolute',
-    top: -rs(50),
+    top: -rs(46),
     right: -rs(30),
-    width: rs(130),
-    height: rs(130),
-    borderRadius: rs(65),
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    width: rs(120),
+    height: rs(120),
+    borderRadius: rs(60),
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
   circleSm: {
     position: 'absolute',
-    bottom: -rs(24),
-    right: rs(30),
-    width: rs(56),
-    height: rs(56),
-    borderRadius: rs(28),
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    bottom: -rs(20),
+    right: rs(28),
+    width: rs(48),
+    height: rs(48),
+    borderRadius: rs(24),
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
 
   badgeRow: {
@@ -187,7 +185,7 @@ const s = StyleSheet.create({
     fontWeight: typography.weights.bold,
     letterSpacing: typography.letterSpacing.tight,
     lineHeight: typography.sizes.md * typography.lineHeights.snug,
-    marginTop: spacing.sm,
+    marginTop: rs(6),
   },
   desc: {
     color: 'rgba(255,255,255,0.85)',
@@ -203,7 +201,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.16)',
     borderRadius: rs(100),
     paddingHorizontal: spacing.sm,
-    paddingVertical: rs(5),
+    paddingVertical: rs(4),
   },
   ctaText: {
     color: colors.textInverse,

@@ -29,6 +29,8 @@ interface CampusQuickActionsProps {
  * Sütun sayısı ekran genişliğine göre reaktif belirlenir (telefonda 2,
  * tablet genişliğinde >=768pt 4) — iPad Split View / web resize gibi
  * durumlarda da doğru kalır (bkz. utils/responsive.ts useResponsive()).
+ * 2 sütun, Türkçe label'ların (örn. "Akademik Takvim") tek satırda rahatça
+ * sığması için yeterince geniş kart alanı bırakıyor.
  */
 export default function CampusQuickActions({ title, items }: CampusQuickActionsProps) {
   const { width, isTablet } = useResponsive();
@@ -64,12 +66,12 @@ const s = StyleSheet.create({
     marginBottom: spacing.md,
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  card: { height: rs(112), borderRadius: rs(16) },
+  card: { height: rs(96), borderRadius: rs(16) },
   cardInner: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', borderRadius: rs(16) },
   iconWrap: {
-    width: rs(40),
-    height: rs(40),
-    borderRadius: rs(12),
+    width: rs(44),
+    height: rs(44),
+    borderRadius: rs(14),
     backgroundColor: colors.iconBg,
     alignItems: 'center',
     justifyContent: 'center',

@@ -45,8 +45,8 @@ type Nav = CompositeNavigationProp<
 
 type HomeItem =
   | { _t: 'FEATURED' }
-  | { _t: 'CAMPUS_LIFE' }
   | { _t: 'QUICK' }
+  | { _t: 'CAMPUS_LIFE' }
   | { _t: 'ANNO_HEADER' }
   | { _t: 'ANNO'; item: Announcement }
   | { _t: 'ANNO_SKELETON' }
@@ -70,8 +70,8 @@ const AnnoCard = React.memo(function AnnoCard({ item, onPress }: AnnoCardProps) 
           </View>
           <Text style={s.annoDate}>{item.date}</Text>
         </View>
-        <Text style={s.annoTitle}>{item.title}</Text>
-        <Text style={s.annoDesc} numberOfLines={3}>{item.excerpt}</Text>
+        <Text style={s.annoTitle} numberOfLines={1}>{item.title}</Text>
+        <Text style={s.annoDesc} numberOfLines={2}>{item.excerpt}</Text>
         <View style={s.annoCta}>
           <Text style={s.annoLink}>Detayları İncele</Text>
           <Ionicons name="arrow-forward" size={rs(13)} color={colors.primary} />
@@ -198,8 +198,8 @@ export default function HomeScreen() {
   const items = useMemo<HomeItem[]>(() => {
     const list: HomeItem[] = [
       { _t: 'FEATURED' },
-      { _t: 'CAMPUS_LIFE' },
       { _t: 'QUICK' },
+      { _t: 'CAMPUS_LIFE' },
       { _t: 'ANNO_HEADER' },
     ];
 
@@ -393,16 +393,16 @@ const s = StyleSheet.create({
   // Event cards
   eventCard: { flexDirection: 'row', alignItems: 'center', borderRadius: rs(16) }, // Removed marginBottom
   eventDateBox: {
-    width: rs(50),
-    height: rs(54),
-    borderRadius: rs(12),
+    width: rs(42),
+    height: rs(46),
+    borderRadius: rs(10),
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
     flexShrink: 0,
   },
-  eventDay: { color: colors.textInverse, fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, lineHeight: typography.sizes.xl },
+  eventDay: { color: colors.textInverse, fontSize: typography.sizes.lg, fontWeight: typography.weights.extrabold, lineHeight: typography.sizes.lg },
   eventMonth: { color: 'rgba(255,255,255,0.85)', fontSize: typography.sizes.xxs, fontWeight: typography.weights.semibold, letterSpacing: typography.letterSpacing.wider, marginTop: rs(2) },
   eventInfo: { flex: 1, minWidth: 0 },
   eventTitle: { fontSize: typography.sizes.base, fontWeight: typography.weights.semibold, color: colors.textPrimary, marginBottom: spacing.xs },
