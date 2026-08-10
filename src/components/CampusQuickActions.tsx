@@ -10,6 +10,8 @@ type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 export interface QuickActionItem {
   label: string;
+  /** Kısa alt açıklama — verilmezse yalnızca label gösterilir */
+  description?: string;
   icon: IconName;
   onPress: () => void;
 }
@@ -27,10 +29,9 @@ interface CampusQuickActionsProps {
  * bölümlerinde farklı `items` ile kullanılır.
  *
  * Sütun sayısı ekran genişliğine göre reaktif belirlenir (telefonda 2,
- * tablet genişliğinde >=768pt 4) — iPad Split View / web resize gibi
- * durumlarda da doğru kalır (bkz. utils/responsive.ts useResponsive()).
- * 2 sütun, Türkçe label'ların (örn. "Akademik Takvim") tek satırda rahatça
- * sığması için yeterince geniş kart alanı bırakıyor.
+ * tablet genişliğinde >=768pt 4). Kart, dikey ortalı boş bir kutu yerine
+ * yatay ikon + label/açıklama düzeni kullanıyor — geniş 2 sütunlu kart
+ * alanını "boş kutu" hissi vermeden dolduruyor.
  */
 export default function CampusQuickActions({ title, items }: CampusQuickActionsProps) {
   const { width, isTablet } = useResponsive();
@@ -45,9 +46,14 @@ export default function CampusQuickActions({ title, items }: CampusQuickActionsP
           <TouchableScale key={i} style={[s.card, { width: cardW }]} onPress={item.onPress}>
             <Card shadow="sm" style={s.cardInner} padding={spacing.sm}>
               <View style={s.iconWrap}>
-                <MaterialCommunityIcons name={item.icon} size={rs(22)} color={colors.primary} />
+                <MaterialCommunityIcons name={item.icon} size={rs(19)} color={colors.primary} />
               </View>
-              <Text style={s.label} numberOfLines={1}>{item.label}</Text>
+              <View style={s.textWrap}>
+                <Text style={s.label} numberOfLines={1}>{item.label}</Text>
+                {item.description && (
+                  <Text style={s.desc} numberOfLines={1}>{item.description}</Text>
+                )}
+              </View>
             </Card>
           </TouchableScale>
         ))}
@@ -66,21 +72,34 @@ const s = StyleSheet.create({
     marginBottom: spacing.md,
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  card: { height: rs(96), borderRadius: rs(16) },
-  cardInner: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', borderRadius: rs(16) },
+  card: { height: rs(74), borderRadius: rs(16) },
+  cardInner: {
+    width: '100%',
+    height: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    borderRadius: rs(16),
+  },
   iconWrap: {
-    width: rs(44),
-    height: rs(44),
-    borderRadius: rs(14),
+    width: rs(38),
+    height: rs(38),
+    borderRadius: rs(12),
     backgroundColor: colors.iconBg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.xs,
+    flexShrink: 0,
   },
+  textWrap: { flex: 1, minWidth: 0 },
   label: {
     fontSize: typography.sizes.sm,
     fontWeight: typography.weights.semibold,
     color: colors.textPrimary,
-    textAlign: 'center',
+  },
+  desc: {
+    fontSize: typography.sizes.xxs,
+    fontWeight: typography.weights.medium,
+    color: colors.textMuted,
+    marginTop: rs(1),
   },
 });

@@ -29,85 +29,100 @@ const TAB_LABELS: Record<keyof RootTabParamList, string> = {
   Contact:       'İletişim',
 };
 
-// İkon + label için ayrılan iç alan (safe-area hariç). rs(56) hem ikonu hem
-// de tek satır label'ı overflow olmadan rahatça barındırıyor.
-const CONTENT_HEIGHT = rs(56);
-const PADDING_TOP = rs(8);
-// insets.bottom bazı Android cihazlarda (3 tuşlu nav bar, edge-to-edge
-// kapalı) 0 dönebiliyor — taban değer tab bar'ın sistem çubuğuna
-// yapışmasını engelliyor.
-const MIN_BOTTOM_INSET = rs(14);
+const BAR_HEIGHT = rs(60);
+const BAR_MARGIN_H = rs(16);
+const BAR_RADIUS = rs(24);
+const TOP_GAP = rs(10);
+// "safe area + 10" — sistem gesture/navigation bar'ı ile floating bar
+// arasında her zaman görünür bir boşluk bırakır.
+const MIN_BOTTOM_GAP = rs(10);
 
 /**
- * Varsayılan React Navigation bottom-tab bar yerine kullanılan, tamamen
- * kontrollü custom tab bar. Label/ikon kırpılmasını kesin olarak önlemek
- * için sabit `overflow: hidden` YOK, negatif margin YOK — her elemanın
- * kendi doğal boyutu kadar yer kaplamasına izin veriliyor.
+ * Floating görünen bottom tab bar.
+ *
+ * Bilinçli olarak `position: 'absolute'` KULLANILMIYOR — absolute bir
+ * floating bar, üstündeki her ekranın scroll içeriğine bar yüksekliği
+ * kadar manuel bottom padding eklemesini gerektirir ve bir ekran bunu
+ * unutursa içerik barın altında kaybolur. Bunun yerine bar, React
+ * Navigation'ın normal flex akışında kalan gerçek bir layout elemanı —
+ * ekran içeriği zaten üstünde flex:1 ile bitiyor, bar kendi doğal
+ * yüksekliğini (üst/alt boşluklar dahil) kaplıyor. Görsel olarak
+ * "floating" hissi, dıştaki şeffaf konteynerin içine oturan, yuvarlak
+ * köşeli, kenarlardan içeri girintili beyaz bar ile elde ediliyor.
  */
 export default function BottomTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const bottomSafe = Math.max(insets.bottom, MIN_BOTTOM_INSET);
-  const barHeight = CONTENT_HEIGHT + PADDING_TOP + bottomSafe;
+  const bottomGap = insets.bottom + MIN_BOTTOM_GAP;
 
   return (
-    <View style={[styles.bar, shadows.tabBar, { height: barHeight, paddingBottom: bottomSafe }]}>
-      {state.routes.map((route, index) => {
-        const name = route.name as keyof RootTabParamList;
-        const isFocused = state.index === index;
-        const icon = isFocused ? TAB_ICONS[name].active : TAB_ICONS[name].inactive;
-        const label = TAB_LABELS[name];
-        const tint = isFocused ? colors.primary : colors.textMuted;
+    <View style={[styles.outer, { paddingTop: TOP_GAP, paddingBottom: bottomGap }]}>
+      <View style={[styles.bar, shadows.lg]}>
+        {state.routes.map((route, index) => {
+          const name = route.name as keyof RootTabParamList;
+          const isFocused = state.index === index;
+          const icon = isFocused ? TAB_ICONS[name].active : TAB_ICONS[name].inactive;
+          const label = TAB_LABELS[name];
+          const tint = isFocused ? colors.primary : colors.textMuted;
 
-        const onPress = () => {
-          const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
+          const onPress = () => {
+            const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
 
-        return (
-          <TouchableScale
-            key={route.key}
-            onPress={onPress}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={label}
-            style={styles.item}
-          >
-            {isFocused && <View style={styles.activeIndicator} />}
-            <Ionicons name={icon} size={rs(22)} color={tint} />
-            <Text style={[styles.label, { color: tint }]} numberOfLines={1}>
-              {label}
-            </Text>
-          </TouchableScale>
-        );
-      })}
+          return (
+            <TouchableScale
+              key={route.key}
+              onPress={onPress}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? { selected: true } : {}}
+              accessibilityLabel={label}
+              style={styles.item}
+            >
+              <View style={[styles.iconWrap, isFocused && styles.iconWrapActive]}>
+                <Ionicons name={icon} size={rs(22)} color={tint} />
+              </View>
+              <Text style={[styles.label, { color: tint }]} numberOfLines={1}>
+                {label}
+              </Text>
+            </TouchableScale>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  outer: {
+    backgroundColor: colors.background,
+    paddingHorizontal: BAR_MARGIN_H,
+  },
   bar: {
     flexDirection: 'row',
+    height: BAR_HEIGHT,
     backgroundColor: colors.tabBarBg,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.borderSubtle,
-    paddingTop: PADDING_TOP,
+    borderRadius: BAR_RADIUS,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.borderSubtle,
   },
   item: {
     flex: 1,
-    height: CONTENT_HEIGHT,
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: rs(3),
+    gap: rs(2),
   },
-  activeIndicator: {
-    position: 'absolute',
-    top: 0,
-    width: rs(22),
-    height: rs(3),
-    borderRadius: rs(2),
-    backgroundColor: colors.primary,
+  iconWrap: {
+    width: rs(34),
+    height: rs(34),
+    borderRadius: rs(12),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconWrapActive: {
+    backgroundColor: colors.primaryFaded,
   },
   label: {
     fontSize: rs(10.5),

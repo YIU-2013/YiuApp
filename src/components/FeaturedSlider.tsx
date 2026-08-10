@@ -4,6 +4,8 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  ImageBackground,
+  ImageSourcePropType,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
@@ -23,6 +25,13 @@ export interface FeaturedSlide {
   type: FeaturedSlideType;
   /** Verilmezse type'a göre varsayılan CTA metni kullanılır */
   ctaLabel?: string;
+  /**
+   * Verilirse kart fotoğraf arka planlı render edilir (koyu gradient
+   * overlay + üzerinde metin). Verilmezse kart görsel geldiğinde birebir
+   * aynı yapıyı kullanabilecek şekilde tasarlanmış, fotoğrafsız "soft
+   * gradient" fallback ile render edilir — asla hata atmaz.
+   */
+  image?: ImageSourcePropType;
   onPress: () => void;
 }
 
@@ -32,28 +41,59 @@ interface FeaturedSliderProps {
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
-const TYPE_META: Record<FeaturedSlideType, { bg: string; icon: IoniconName; badge: string; cta: string }> = {
-  announcement: { bg: colors.primary,   icon: 'megaphone-outline', badge: 'Duyuru',   cta: 'Detayları Gör' },
-  event:        { bg: colors.accent,    icon: 'calendar-outline',  badge: 'Etkinlik', cta: 'Etkinliği Görüntüle' },
-  opportunity:  { bg: colors.success,   icon: 'pricetag-outline',  badge: 'Fırsat',    cta: 'Fırsatı İncele' },
-  campus:       { bg: colors.info,      icon: 'compass-outline',   badge: 'Kampüs',    cta: 'Keşfet' },
+// Kategori ayrımı yalnızca küçük badge ikonu/metniyle yapılıyor — kartın
+// kendisi (fotoğraflı ya da fallback) her zaman kurumsal lacivert temelli;
+// böylece kırmızı yalnızca "Etkinlik" badge'inde küçük bir vurgu olarak
+// kalıyor, büyük bir kırmızı blok hiçbir zaman oluşmuyor.
+const TYPE_META: Record<FeaturedSlideType, { accent: string; icon: IoniconName; badge: string; cta: string }> = {
+  announcement: { accent: colors.primary, icon: 'megaphone-outline', badge: 'Duyuru',   cta: 'Detayları Gör' },
+  event:        { accent: colors.accent,  icon: 'calendar-outline',  badge: 'Etkinlik', cta: 'Etkinliği Görüntüle' },
+  opportunity:  { accent: colors.success, icon: 'pricetag-outline',  badge: 'Fırsat',    cta: 'Fırsatı İncele' },
+  campus:       { accent: colors.info,    icon: 'compass-outline',   badge: 'Kampüs',    cta: 'Keşfet' },
 };
+
+/** Fotoğrafın üstünde metni okunaklı kılan, alta doğru koyulaşan lacivert
+ * scrim — gerçek gradient kütüphanesi olmadan (yeni dependency yasak)
+ * kademeli opaklık bantlarıyla simüle ediliyor. */
+function GradientScrim() {
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      <View style={[s.band, { top: '0%',  height: '38%', backgroundColor: 'rgba(7,27,66,0.05)' }]} />
+      <View style={[s.band, { top: '38%', height: '22%', backgroundColor: 'rgba(7,27,66,0.30)' }]} />
+      <View style={[s.band, { top: '60%', height: '20%', backgroundColor: 'rgba(7,27,66,0.58)' }]} />
+      <View style={[s.band, { top: '80%', height: '20%', backgroundColor: 'rgba(7,27,66,0.80)' }]} />
+    </View>
+  );
+}
+
+/** Fotoğraf yokken kullanılan, düz tek renk yerine geçen soft gradient
+ * dolgu — açık lacivertten koyu laciverte kademeli geçiş. */
+function GradientFill() {
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      <View style={[s.band, { top: '0%',  height: '30%', backgroundColor: '#2D5BAB' }]} />
+      <View style={[s.band, { top: '30%', height: '25%', backgroundColor: 'rgba(11,46,107,0.92)' }]} />
+      <View style={[s.band, { top: '55%', height: '45%', backgroundColor: colors.primary }]} />
+    </View>
+  );
+}
 
 /**
  * Ana Sayfa'da (ve gerekirse başka ekranlarda) öğrenciye özel öne çıkan
- * içerikleri (duyuru/etkinlik/fırsat/kampüs) gösteren yatay kaydırmalı,
- * data-driven slider. Görsel yoksa type'a göre tema renkli, dekoratif
- * katmanlı "premium" kart (VideoCard/CampusLifeCard ile aynı
- * görsel dil) fallback olarak kullanılır.
+ * içerikleri (duyuru/etkinlik/fırsat/kampüs) gösteren, tek odaklı, tam
+ * genişlikte kaydırmalı slider. `slide.image` verilirse fotoğraf +
+ * gradient overlay, verilmezse aynı yapıda fotoğrafsız gradient fallback
+ * render edilir — component her iki durumda da hatasız çalışır.
+ *
+ * Kart genişliği ekranı (yatay padding hariç) tamamen dolduruyor; bir
+ * sonraki kart kaydırılana kadar görünmüyor — "kesik önizleme" sorunu
+ * yapısal olarak ortadan kaldırılmış oluyor.
  *
  * Boş `slides` dizisi güvenle ele alınır (render edilmez, hata atmaz).
  */
 export default function FeaturedSlider({ slides }: FeaturedSliderProps) {
   const { width } = useResponsive();
-  // Kart genişliği ekran genişliğinin (container değil) %83'ü — sağda
-  // görünen bir sonraki kartın "preview" payı bilinçli olarak dar
-  // tutuluyor, aksi halde ikinci (kırmızı) kart fazla baskın görünüyordu.
-  const CARD_W = Math.round(width * 0.83);
+  const CARD_W = width - spacing.base * 2;
   const GAP = spacing.sm;
   const SNAP = CARD_W + GAP;
 
@@ -90,31 +130,43 @@ export default function FeaturedSlider({ slides }: FeaturedSliderProps) {
         {slides.map((slide, i) => {
           const meta = TYPE_META[slide.type];
           const isLast = i === slides.length - 1;
+
+          const content = (
+            <>
+              <View style={s.badgeRow}>
+                <Ionicons name={meta.icon} size={rs(12)} color={meta.accent} />
+                <Text style={[s.badgeText, { color: meta.accent }]}>{slide.badge ?? meta.badge}</Text>
+              </View>
+
+              <View style={s.bottomBlock}>
+                <Text style={s.title} numberOfLines={2}>{slide.title}</Text>
+                <Text style={s.desc} numberOfLines={1}>{slide.description}</Text>
+
+                <View style={s.ctaRow}>
+                  <Text style={s.ctaText}>{slide.ctaLabel ?? meta.cta}</Text>
+                  <Ionicons name="arrow-forward" size={rs(13)} color={colors.primary} />
+                </View>
+              </View>
+            </>
+          );
+
           return (
             <TouchableScale
               key={slide.id}
               onPress={slide.onPress}
-              style={[
-                s.card,
-                shadows.md,
-                { width: CARD_W, marginRight: isLast ? 0 : GAP, backgroundColor: meta.bg },
-              ]}
+              style={[s.cardShell, shadows.md, { width: CARD_W, marginRight: isLast ? 0 : GAP }]}
             >
-              <View style={s.circleLg} />
-              <View style={s.circleSm} />
-
-              <View style={s.badgeRow}>
-                <Ionicons name={meta.icon} size={rs(13)} color={colors.textInverse} />
-                <Text style={s.badgeText}>{slide.badge ?? meta.badge}</Text>
-              </View>
-
-              <Text style={s.title} numberOfLines={2}>{slide.title}</Text>
-              <Text style={s.desc} numberOfLines={1}>{slide.description}</Text>
-
-              <View style={s.ctaRow}>
-                <Text style={s.ctaText}>{slide.ctaLabel ?? meta.cta}</Text>
-                <Ionicons name="arrow-forward" size={rs(13)} color={colors.textInverse} />
-              </View>
+              {slide.image ? (
+                <ImageBackground source={slide.image} style={s.card} imageStyle={s.cardImage} resizeMode="cover">
+                  <GradientScrim />
+                  {content}
+                </ImageBackground>
+              ) : (
+                <View style={s.card}>
+                  <GradientFill />
+                  {content}
+                </View>
+              )}
             </TouchableScale>
           );
         })}
@@ -135,32 +187,24 @@ const s = StyleSheet.create({
   wrapper: { marginBottom: spacing.md },
   scrollContent: { paddingRight: spacing.base },
 
-  card: {
-    height: rs(142),
+  cardShell: {
+    height: rs(176),
     borderRadius: rs(20),
-    padding: spacing.base,
+  },
+  card: {
+    flex: 1,
+    borderRadius: rs(20),
     overflow: 'hidden',
+    padding: spacing.base,
     justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
   },
-  circleLg: {
-    position: 'absolute',
-    top: -rs(46),
-    right: -rs(30),
-    width: rs(120),
-    height: rs(120),
-    borderRadius: rs(60),
-    backgroundColor: 'rgba(255,255,255,0.06)',
+  cardImage: {
+    borderRadius: rs(20),
   },
-  circleSm: {
+  band: {
     position: 'absolute',
-    bottom: -rs(20),
-    right: rs(28),
-    width: rs(48),
-    height: rs(48),
-    borderRadius: rs(24),
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    left: 0,
+    right: 0,
   },
 
   badgeRow: {
@@ -168,45 +212,46 @@ const s = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     gap: rs(4),
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: 'rgba(255,255,255,0.92)',
     borderRadius: rs(100),
     paddingHorizontal: spacing.sm,
-    paddingVertical: rs(3),
+    paddingVertical: rs(4),
   },
   badgeText: {
-    color: colors.textInverse,
     fontSize: typography.sizes.xxs,
     fontWeight: typography.weights.bold,
     letterSpacing: typography.letterSpacing.caps,
   },
+
+  bottomBlock: {},
   title: {
     color: colors.textInverse,
-    fontSize: typography.sizes.md,
+    fontSize: typography.sizes.lg,
     fontWeight: typography.weights.bold,
     letterSpacing: typography.letterSpacing.tight,
-    lineHeight: typography.sizes.md * typography.lineHeights.snug,
-    marginTop: rs(6),
+    lineHeight: typography.sizes.lg * typography.lineHeights.snug,
   },
   desc: {
-    color: 'rgba(255,255,255,0.85)',
+    color: 'rgba(255,255,255,0.88)',
     fontSize: typography.sizes.xs,
     lineHeight: typography.sizes.xs * typography.lineHeights.normal,
-    marginTop: rs(2),
+    marginTop: rs(3),
   },
   ctaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
     gap: spacing.xs,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: colors.textInverse,
     borderRadius: rs(100),
-    paddingHorizontal: spacing.sm,
-    paddingVertical: rs(4),
+    paddingHorizontal: spacing.md,
+    paddingVertical: rs(6),
+    marginTop: spacing.sm,
   },
   ctaText: {
-    color: colors.textInverse,
+    color: colors.primary,
     fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.semibold,
+    fontWeight: typography.weights.bold,
   },
 
   dotsRow: {

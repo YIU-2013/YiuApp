@@ -27,32 +27,44 @@ const MINI_ITEMS: { icon: IoniconName; label: string }[] = [
 export default function CampusLifeCard({ onPress }: CampusLifeCardProps) {
   return (
     <TouchableScale onPress={onPress}>
-      <Card shadow="sm" style={s.card}>
-        <View style={s.headerRow}>
-          <View style={s.iconWrap}>
-            <Ionicons name="compass" size={rs(18)} color={colors.primary} />
-          </View>
-          <View style={s.headerText}>
-            <Text style={s.title}>Kampüste Yaşam</Text>
-            <Text style={s.desc}>
-              Etkinlikleri, öğrenci fırsatlarını ve kampüs olanaklarını tek yerden keşfet.
-            </Text>
-          </View>
-        </View>
+      {/* padding={0}: iç boşluk s.content'e taşındı — s.clip'in overflow:hidden'ı
+          yalnızca dekoratif daireyi kırpar, Card'ın kendi gölgesini (Android'de
+          elevation) etkilemez (bkz. Card.tsx — shadow-bearing view her zaman
+          overflow:'visible' kalmalı). */}
+      <Card shadow="sm" padding={0} style={s.card}>
+        <View style={s.clip}>
+          <View style={s.decorCircle} pointerEvents="none" />
 
-        <View style={s.chipRow}>
-          {MINI_ITEMS.map(mi => (
-            <View key={mi.label} style={s.chip}>
-              <Ionicons name={mi.icon} size={rs(16)} color={colors.primary} />
-              <Text style={s.chipLabel}>{mi.label}</Text>
+          <View style={s.content}>
+            <View style={s.headerRow}>
+              <View style={s.iconWrap}>
+                <Ionicons name="compass" size={rs(18)} color={colors.primary} />
+              </View>
+              <View style={s.headerText}>
+                <Text style={s.title}>Kampüste Yaşam</Text>
+                <Text style={s.desc}>
+                  Etkinlikleri, öğrenci fırsatlarını ve kampüs olanaklarını tek yerden keşfet.
+                </Text>
+              </View>
             </View>
-          ))}
-        </View>
 
-        <View style={s.ctaRow}>
-          <Text style={s.ctaText}>Kampüsüm’e Git</Text>
-          <View style={s.ctaArrowWrap}>
-            <Ionicons name="arrow-forward" size={rs(13)} color={colors.textInverse} />
+            <View style={s.chipRow}>
+              {MINI_ITEMS.map(mi => (
+                <View key={mi.label} style={s.chip}>
+                  <View style={s.chipIconWrap}>
+                    <Ionicons name={mi.icon} size={rs(16)} color={colors.primary} />
+                  </View>
+                  <Text style={s.chipLabel}>{mi.label}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={s.ctaRow}>
+              <Text style={s.ctaText}>Kampüsüm’e Git</Text>
+              <View style={s.ctaArrowWrap}>
+                <Ionicons name="arrow-forward" size={rs(13)} color={colors.textInverse} />
+              </View>
+            </View>
           </View>
         </View>
       </Card>
@@ -64,6 +76,22 @@ const s = StyleSheet.create({
   card: {
     borderRadius: rs(18),
     marginBottom: spacing.md,
+  },
+  clip: {
+    borderRadius: rs(18),
+    overflow: 'hidden',
+  },
+  content: {
+    padding: spacing.base,
+  },
+  decorCircle: {
+    position: 'absolute',
+    top: -rs(30),
+    right: -rs(20),
+    width: rs(90),
+    height: rs(90),
+    borderRadius: rs(45),
+    backgroundColor: colors.primaryFaded,
   },
   headerRow: {
     flexDirection: 'row',
@@ -103,9 +131,19 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.background,
-    borderRadius: rs(12),
+    borderRadius: rs(14),
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.borderSubtle,
     paddingVertical: spacing.sm,
-    gap: rs(4),
+    gap: rs(6),
+  },
+  chipIconWrap: {
+    width: rs(30),
+    height: rs(30),
+    borderRadius: rs(10),
+    backgroundColor: colors.iconBg,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   chipLabel: {
     fontSize: typography.sizes.xxs,

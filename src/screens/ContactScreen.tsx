@@ -35,9 +35,9 @@ export default function ContactScreen() {
   }, []);
 
   const quickLinks = useMemo<QuickActionItem[]>(() => [
-    { label: 'Bölümler',   icon: 'view-dashboard-outline', onPress: () => nav.navigate('Departments') },
-    { label: 'Kampüsüm',   icon: 'compass-outline',        onPress: () => nav.navigate('Campus') },
-    { label: 'Fırsatlar',  icon: 'tag-outline',            onPress: () => nav.navigate('Opportunities') },
+    { label: 'Bölümler',   description: 'Akademik birimler',   icon: 'view-dashboard-outline', onPress: () => nav.navigate('Departments') },
+    { label: 'Kampüsüm',   description: 'Kampüs yaşamı',       icon: 'compass-outline',        onPress: () => nav.navigate('Campus') },
+    { label: 'Fırsatlar',  description: 'Öğrenci avantajları', icon: 'tag-outline',            onPress: () => nav.navigate('Opportunities') },
   ], [nav]);
 
   return (

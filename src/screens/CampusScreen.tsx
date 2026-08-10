@@ -53,11 +53,11 @@ export default function CampusScreen() {
   const nav = useNavigation<Nav>();
 
   const quickLinks = useMemo<QuickActionItem[]>(() => [
-    { label: 'Duyurular',      icon: 'bullhorn-outline',        onPress: () => nav.navigate('Home') },
-    { label: 'Etkinlikler',    icon: 'calendar-check-outline',  onPress: () => nav.navigate('Home') },
-    { label: 'Bölümler',       icon: 'view-dashboard-outline',  onPress: () => nav.navigate('Departments') },
-    { label: 'Fırsatlar',      icon: 'tag-outline',             onPress: () => nav.navigate('Opportunities') },
-    { label: 'İletişim',       icon: 'phone-outline',           onPress: () => nav.navigate('Contact') },
+    { label: 'Duyurular',      description: 'Güncel bilgilendirmeler', icon: 'bullhorn-outline',        onPress: () => nav.navigate('Home') },
+    { label: 'Etkinlikler',    description: 'Kampüste bu hafta',       icon: 'calendar-check-outline',  onPress: () => nav.navigate('Home') },
+    { label: 'Bölümler',       description: 'Akademik birimler',       icon: 'view-dashboard-outline',  onPress: () => nav.navigate('Departments') },
+    { label: 'Fırsatlar',      description: 'Öğrenci avantajları',     icon: 'tag-outline',             onPress: () => nav.navigate('Opportunities') },
+    { label: 'İletişim',       description: 'Bize ulaşın',             icon: 'phone-outline',           onPress: () => nav.navigate('Contact') },
   ], [nav]);
 
   return (

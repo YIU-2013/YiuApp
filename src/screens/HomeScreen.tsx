@@ -34,6 +34,10 @@ import { EVENTS_KEY } from '../hooks/useEvents';
 import { Announcement, Event } from '../types/models';
 import { HomeStackParamList, RootTabParamList } from '../navigation/types';
 
+// FeaturedSlider'ın "Kampüs" slide'ı için gerçek kampüs fotoğrafı — proje
+// assets'inde zaten mevcut (Tıp Fakültesi binası havadan görünüm).
+const CAMPUS_IMAGE = require('../../assets/images/campus.png');
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 // Home tabından hem kendi stack'i (detay ekranları) hem de diğer sekmelere
 // (Kampüsüm, Fırsatlar, İletişim...) type-safe geçiş yapabilmek için composite
@@ -188,6 +192,7 @@ export default function HomeScreen() {
       title: 'Kampüs Hayatını Keşfet',
       description: 'Kütüphane, kulüpler, yemekhane ve daha fazlası Kampüsüm sekmesinde seni bekliyor.',
       type: 'campus',
+      image: CAMPUS_IMAGE,
       onPress: () => nav.navigate('Campus'),
     });
 
@@ -240,12 +245,12 @@ export default function HomeScreen() {
 
   // ── Kampüs hızlı erişim aksiyonları (diğer sekmelere / ilgili section'a gider)
   const quickActionItems = useMemo<QuickActionItem[]>(() => [
-    { label: 'Duyurular',        icon: 'bullhorn-outline',       onPress: scrollToAnnouncements },
-    { label: 'Etkinlikler',      icon: 'calendar-check-outline', onPress: scrollToEvents },
-    { label: 'Akademik Takvim',  icon: 'calendar-month-outline', onPress: () => nav.navigate('Campus') },
-    { label: 'Fırsatlar',        icon: 'tag-outline',            onPress: () => nav.navigate('Opportunities') },
-    { label: 'İletişim',         icon: 'phone-outline',          onPress: () => nav.navigate('Contact') },
-    { label: 'Kampüs Haritası',  icon: 'map-marker-outline',     onPress: () => nav.navigate('Campus') },
+    { label: 'Duyurular',        description: 'Güncel bilgilendirmeler', icon: 'bullhorn-outline',       onPress: scrollToAnnouncements },
+    { label: 'Etkinlikler',      description: 'Kampüste bu hafta',       icon: 'calendar-check-outline', onPress: scrollToEvents },
+    { label: 'Akademik Takvim',  description: 'Önemli tarihler',         icon: 'calendar-month-outline', onPress: () => nav.navigate('Campus') },
+    { label: 'Fırsatlar',        description: 'Öğrenci avantajları',     icon: 'tag-outline',            onPress: () => nav.navigate('Opportunities') },
+    { label: 'İletişim',         description: 'Bize ulaşın',             icon: 'phone-outline',          onPress: () => nav.navigate('Contact') },
+    { label: 'Kampüs Haritası',  description: 'Yerleşkeyi keşfet',       icon: 'map-marker-outline',     onPress: () => nav.navigate('Campus') },
   ], [nav, scrollToAnnouncements, scrollToEvents]);
 
   // ── FlashList renderItem
