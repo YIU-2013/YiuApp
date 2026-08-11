@@ -257,7 +257,7 @@ export default function HomeScreen() {
   const renderItem = useCallback(
     ({ item }: { item: HomeItem }) => {
       switch (item._t) {
-        case 'FEATURED':    return <FeaturedSlider slides={featuredSlides} title="Öne Çıkanlar" onSeeAll={() => {}} />;
+        case 'FEATURED':    return <FeaturedSlider slides={featuredSlides} />;
         case 'CAMPUS_LIFE': return <CampusLifeCard onPress={() => nav.navigate('Campus')} />;
         case 'QUICK':       return <CampusQuickActions title="Hızlı Erişim" items={quickActionItems} />;
         case 'ANNO_HEADER': return (

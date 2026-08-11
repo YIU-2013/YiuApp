@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import TouchableScale from './TouchableScale';
 import { colors, spacing, typography, shadows } from '../theme';
-import { rs } from '../utils/responsive';
+import { rs, useResponsive } from '../utils/responsive';
 
 export type FeaturedSlideType = 'announcement' | 'opportunity' | 'event' | 'campus';
 
@@ -37,11 +37,6 @@ export interface FeaturedSlide {
 
 interface FeaturedSliderProps {
   slides: FeaturedSlide[];
-  /** Verilirse carousel'in üstünde başlık satırı render edilir */
-  title?: string;
-  /** title ile birlikte verilirse başlığın yanında bir buton render edilir */
-  onSeeAll?: () => void;
-  seeAllLabel?: string;
 }
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -88,9 +83,11 @@ function GradientBands({ rgb, opacities }: { rgb: string; opacities: number[] })
   );
 }
 
-// Fotoğrafın üstünde metni okunaklı kılan, alta doğru koyulaşan lacivert
-// scrim (navy950 tonu).
-const SCRIM_OPACITIES = buildOpacitySteps(0.82);
+// Fotoğrafın üstünde metni her koşulda okunaklı kılan, alta doğru koyulaşan
+// lacivert scrim (navy950 tonu). Üst sınır 0.92'ye çıkarıldı — parlak/açık
+// renkli fotoğraflarda dahi alttaki başlık/açıklama bloğunun arkası yeterince
+// koyu kalsın diye (önceki 0.82 bazı fotoğraflarda metni zayıflatıyordu).
+const SCRIM_OPACITIES = buildOpacitySteps(0.92);
 /** Fotoğraf yokken kullanılan, düz tek renk yerine geçen soft gradient
  * dolgu — açık lacivertten koyu laciverte pürüzsüz geçiş. */
 const FILL_OPACITIES = buildOpacitySteps(0.9, 1.4);
@@ -108,152 +105,106 @@ function GradientFill() {
   );
 }
 
-// ─── M3 "Uncontained multi-aspect ratio" carousel ölçüleri ────────────────────
-// bkz. https://m3.material.io/components/carousel/specs
-// Sabit satır yüksekliği + döngüsel en-boy oranı dizisi ile her kart farklı
-// genişlikte render edilir (spec'teki örnek sırayla birebir: 16:9, 9:16,
-// 1:1, 3:4). Yalnızca "leading" (sol) padding var — sağda padding yok,
-// kartlar konteynerin kenarından taşarak (uncontained) kayar.
-const ROW_HEIGHT = rs(200);
-const ITEM_RADIUS = rs(28); // M3 spec: "Item corner radius: 28dp"
-const GAP = spacing.sm; // M3 spec: "Padding between elements: 8dp"
-const LEADING_PADDING = spacing.base; // M3 spec: "Leading padding: 16dp"
-const ASPECT_RATIOS = [16 / 9, 9 / 16, 1 / 1, 3 / 4];
-
 /**
  * Ana Sayfa'da öğrenciye özel öne çıkan içerikleri (duyuru/etkinlik/fırsat/
- * kampüs) gösteren, Material Design 3 "Uncontained multi-aspect ratio"
- * carousel deseni. Her kart, spec'teki döngüsel en-boy oranına (16:9, 9:16,
- * 1:1, 3:4) göre sabit satır yüksekliğinden dinamik genişlik alır; konteyner
- * yalnızca sol tarafta dolgu bırakır, kartlar sağ kenardan taşarak kayar.
+ * kampüs) gösteren, tek odaklı, tam genişlikte kaydırmalı slider. Her
+ * ekranda yalnızca tek bir ana kart odakta olur — bir sonraki kart tamamen
+ * kaydırılana kadar görünmez, böylece kartlar hiçbir zaman dar/okunaksız
+ * bir önizleme şeridine dönüşmez.
  *
- * Dar (en-boy oranı < 1) kartlarda metin içeriği daralan alana sığması için
- * yalnızca ikon rozeti + başlığa indirgenir; geniş kartlarda rozet, başlık,
- * açıklama ve CTA tam olarak gösterilir.
+ * `slide.image` verilirse fotoğraf + gradient overlay, verilmezse aynı
+ * yapıda fotoğrafsız gradient fallback render edilir — component her iki
+ * durumda da hatasız çalışır.
  *
  * Boş `slides` dizisi güvenle ele alınır (render edilmez, hata atmaz).
  */
-export default function FeaturedSlider({ slides, title, onSeeAll, seeAllLabel = 'TÜMÜNÜ GÖR' }: FeaturedSliderProps) {
+export default function FeaturedSlider({ slides }: FeaturedSliderProps) {
+  const { width } = useResponsive();
+  const CARD_W = width - spacing.base * 2;
+  const GAP = spacing.sm;
+  const SNAP = CARD_W + GAP;
+
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const itemWidths = useMemo(
-    () => slides.map((_, i) => Math.round(ROW_HEIGHT * ASPECT_RATIOS[i % ASPECT_RATIOS.length])),
-    [slides.length]
-  );
-
-  // Her kartın "dinlenme" konumundaki sol kenarını viewport'un sol kenarına
-  // (padding hariç) hizalayan snap noktaları — M3'teki "sonraki kart her
-  // zaman kenara yaslanır" davranışını taklit eder.
-  const offsets = useMemo(() => {
-    const arr: number[] = [0];
-    let acc = LEADING_PADDING;
-    itemWidths.forEach((w, i) => {
-      acc += w + GAP;
-      if (i < itemWidths.length - 1) arr.push(acc);
-    });
-    return arr;
-  }, [itemWidths]);
-
+  // Hem sürükleme sırasında (onScroll) hem de bırakıldığında
+  // (onMomentumScrollEnd) çalışır — yalnızca momentum-end'e güvenmek
+  // web/trackpad kaydırmada dot senkronunun kopmasına yol açıyordu.
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      if (offsets.length === 0) return;
-      const x = e.nativeEvent.contentOffset.x;
-      const idx = offsets.reduce(
-        (best, off, i) => (Math.abs(off - x) < Math.abs(offsets[best] - x) ? i : best),
-        0
-      );
-      setActiveIndex(prev => (prev === idx ? prev : idx));
+      if (SNAP <= 0) return;
+      const idx = Math.round(e.nativeEvent.contentOffset.x / SNAP);
+      const clamped = Math.max(0, Math.min(idx, slides.length - 1));
+      setActiveIndex(prev => (prev === clamped ? prev : clamped));
     },
-    [offsets]
+    [SNAP, slides.length]
   );
 
   if (slides.length === 0) return null;
 
   return (
     <View style={s.wrapper}>
-      {title && (
-        <View style={s.headerRow}>
-          <Text style={s.headerTitle}>{title}</Text>
-          {onSeeAll && (
-            <TouchableScale onPress={onSeeAll} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <Text style={s.headerCta}>{seeAllLabel}</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        decelerationRate="fast"
+        snapToInterval={SNAP}
+        snapToAlignment="start"
+        contentContainerStyle={s.scrollContent}
+        onScroll={handleScroll}
+        onMomentumScrollEnd={handleScroll}
+        scrollEventThrottle={16}
+      >
+        {slides.map((slide, i) => {
+          const meta = TYPE_META[slide.type];
+          const isLast = i === slides.length - 1;
+
+          const content = (
+            <>
+              <View style={s.badgeRow}>
+                <Ionicons name={meta.icon} size={rs(12)} color={meta.accent} />
+                <Text style={[s.badgeText, { color: meta.accent }]}>{slide.badge ?? meta.badge}</Text>
+              </View>
+
+              <View style={s.bottomBlock}>
+                <Text style={s.title} numberOfLines={2}>{slide.title}</Text>
+                <Text style={s.desc} numberOfLines={2}>{slide.description}</Text>
+
+                <View style={s.ctaRow}>
+                  <Text style={s.ctaText}>{slide.ctaLabel ?? meta.cta}</Text>
+                  <Ionicons name="arrow-forward" size={rs(13)} color={colors.primary} />
+                </View>
+              </View>
+            </>
+          );
+
+          return (
+            <TouchableScale
+              key={slide.id}
+              onPress={slide.onPress}
+              style={[s.cardShell, shadows.md, { width: CARD_W, marginRight: isLast ? 0 : GAP }]}
+            >
+              {slide.image ? (
+                <ImageBackground source={slide.image} style={s.card} imageStyle={s.cardImage} resizeMode="cover">
+                  <GradientScrim />
+                  {content}
+                </ImageBackground>
+              ) : (
+                <View style={s.card}>
+                  <GradientFill />
+                  <Ionicons
+                    name={meta.icon}
+                    size={rs(120)}
+                    color="rgba(255,255,255,0.12)"
+                    style={s.watermarkIcon}
+                    pointerEvents="none"
+                  />
+                  {content}
+                </View>
+              )}
             </TouchableScale>
-          )}
-        </View>
-      )}
-
-      <View style={s.bleed}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          decelerationRate="fast"
-          snapToOffsets={offsets}
-          contentContainerStyle={s.scrollContent}
-          onScroll={handleScroll}
-          onMomentumScrollEnd={handleScroll}
-          scrollEventThrottle={16}
-        >
-          {slides.map((slide, i) => {
-            const meta = TYPE_META[slide.type];
-            const ratio = ASPECT_RATIOS[i % ASPECT_RATIOS.length];
-            const compact = ratio < 1;
-            const isLast = i === slides.length - 1;
-
-            const content = compact ? (
-              <>
-                <View style={s.iconBadge}>
-                  <Ionicons name={meta.icon} size={rs(14)} color={meta.accent} />
-                </View>
-                <Text style={s.compactTitle} numberOfLines={3}>{slide.title}</Text>
-              </>
-            ) : (
-              <>
-                <View style={s.badgeRow}>
-                  <Ionicons name={meta.icon} size={rs(12)} color={meta.accent} />
-                  <Text style={[s.badgeText, { color: meta.accent }]}>{slide.badge ?? meta.badge}</Text>
-                </View>
-
-                <View style={s.bottomBlock}>
-                  <Text style={s.title} numberOfLines={2}>{slide.title}</Text>
-                  <Text style={s.desc} numberOfLines={2}>{slide.description}</Text>
-
-                  <View style={s.ctaRow}>
-                    <Text style={s.ctaText}>{slide.ctaLabel ?? meta.cta}</Text>
-                    <Ionicons name="arrow-forward" size={rs(13)} color={colors.primary} />
-                  </View>
-                </View>
-              </>
-            );
-
-            return (
-              <TouchableScale
-                key={slide.id}
-                onPress={slide.onPress}
-                style={[s.cardShell, shadows.md, { width: itemWidths[i], marginRight: isLast ? 0 : GAP }]}
-              >
-                {slide.image ? (
-                  <ImageBackground source={slide.image} style={s.card} imageStyle={s.cardImage} resizeMode="cover">
-                    <GradientScrim />
-                    {content}
-                  </ImageBackground>
-                ) : (
-                  <View style={s.card}>
-                    <GradientFill />
-                    <Ionicons
-                      name={meta.icon}
-                      size={rs(120)}
-                      color="rgba(255,255,255,0.12)"
-                      style={s.watermarkIcon}
-                      pointerEvents="none"
-                    />
-                    {content}
-                  </View>
-                )}
-              </TouchableScale>
-            );
-          })}
-        </ScrollView>
-      </View>
+          );
+        })}
+      </ScrollView>
 
       {slides.length > 1 && (
         <View style={s.dotsRow}>
@@ -268,45 +219,21 @@ export default function FeaturedSlider({ slides, title, onSeeAll, seeAllLabel = 
 
 const s = StyleSheet.create({
   wrapper: { marginBottom: spacing.md },
-
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
-  },
-  headerTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.primary,
-    letterSpacing: typography.letterSpacing.tight,
-  },
-  headerCta: {
-    fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.semibold,
-    color: colors.accent,
-    letterSpacing: typography.letterSpacing.caps,
-  },
-
-  // Ebeveynin (HomeScreen listContent) yatay padding'ini iptal edip yerine
-  // yalnızca M3 spec'teki "leading padding: 16dp"yi koyuyor — sağda padding
-  // yok, kartlar konteynerin sağ kenarından taşarak (uncontained) kayabiliyor.
-  bleed: { marginHorizontal: -spacing.base },
-  scrollContent: { paddingLeft: LEADING_PADDING, paddingVertical: spacing.sm },
+  scrollContent: { paddingRight: spacing.base },
 
   cardShell: {
-    height: ROW_HEIGHT,
-    borderRadius: ITEM_RADIUS,
+    height: rs(192),
+    borderRadius: rs(20),
   },
   card: {
     flex: 1,
-    borderRadius: ITEM_RADIUS,
+    borderRadius: rs(20),
     overflow: 'hidden',
     padding: spacing.base,
     justifyContent: 'space-between',
   },
   cardImage: {
-    borderRadius: ITEM_RADIUS,
+    borderRadius: rs(20),
   },
   band: {
     position: 'absolute',
@@ -364,25 +291,6 @@ const s = StyleSheet.create({
     color: colors.primary,
     fontSize: typography.sizes.xs,
     fontWeight: typography.weights.bold,
-  },
-
-  // Dar (en-boy oranı < 1) kartlarda tam rozet+açıklama+CTA sığmadığı için
-  // kullanılan sadeleştirilmiş içerik: yalnızca ikon rozeti + başlık.
-  iconBadge: {
-    width: rs(26),
-    height: rs(26),
-    borderRadius: rs(13),
-    alignSelf: 'flex-start',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-  },
-  compactTitle: {
-    color: colors.textInverse,
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.bold,
-    letterSpacing: typography.letterSpacing.tight,
-    lineHeight: typography.sizes.sm * typography.lineHeights.snug,
   },
 
   dotsRow: {
