@@ -158,8 +158,6 @@ export default function HomeScreen() {
       list.push({
         id: `anno-${topAnno.id}`,
         title: topAnno.title,
-        description: topAnno.excerpt,
-        badge: topAnno.type,
         type: 'announcement',
         onPress: () => nav.navigate('AnnouncementDetail', { announcement: topAnno }),
       });
@@ -170,7 +168,6 @@ export default function HomeScreen() {
       list.push({
         id: `event-${topEvent.id}`,
         title: topEvent.title,
-        description: `${topEvent.day} ${topEvent.month} · ${topEvent.location}`,
         type: 'event',
         onPress: () => nav.navigate('EventDetail', { event: topEvent }),
       });
@@ -181,7 +178,6 @@ export default function HomeScreen() {
       list.push({
         id: `opp-${topOpportunity.id}`,
         title: topOpportunity.title,
-        description: topOpportunity.description,
         type: 'opportunity',
         onPress: () => nav.navigate('Opportunities'),
       });
@@ -190,7 +186,6 @@ export default function HomeScreen() {
     list.push({
       id: 'campus-highlight',
       title: 'Kampüs Hayatını Keşfet',
-      description: 'Kütüphane, kulüpler, yemekhane ve daha fazlası Kampüsüm sekmesinde seni bekliyor.',
       type: 'campus',
       image: CAMPUS_IMAGE,
       onPress: () => nav.navigate('Campus'),
